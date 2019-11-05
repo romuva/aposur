@@ -1,0 +1,81 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Game.gd" type="Script" id=1]
+[ext_resource path="res://Area2DTown.gd" type="Script" id=2]
+[ext_resource path="res://town.png" type="Texture" id=3]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 53.0951
+
+[node name="Game" type="Node"]
+script = ExtResource( 1 )
+
+[node name="Area2DTown" type="Area2D" parent="."]
+script = ExtResource( 2 )
+
+[node name="Town" type="Sprite" parent="Area2DTown"]
+position = Vector2( 500, 100 )
+texture = ExtResource( 3 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DTown"]
+position = Vector2( 500, 100 )
+shape = SubResource( 1 )
+
+[node name="Label" type="Label" parent="Area2DTown"]
+margin_left = 475.752
+margin_top = 92.7404
+margin_right = 523.752
+margin_bottom = 106.74
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Alkubra"
+align = 1
+
+[node name="Label2" type="Label" parent="Area2DTown"]
+margin_left = 451.365
+margin_top = 107.858
+margin_right = 499.365
+margin_bottom = 121.858
+rect_pivot_offset = Vector2( 24, 7 )
+text = "Water:"
+align = 1
+
+[node name="Label3" type="Label" parent="Area2DTown"]
+margin_left = 453.804
+margin_top = 121.026
+margin_right = 504.804
+margin_bottom = 135.026
+rect_pivot_offset = Vector2( 24, 7 )
+text = "Food:"
+
+[node name="Label4" type="Label" parent="Area2DTown"]
+margin_left = 453.804
+margin_top = 133.217
+margin_right = 504.804
+margin_bottom = 147.217
+rect_pivot_offset = Vector2( 24, 7 )
+text = "Ammo:"
+
+[node name="WaterCountLabel" type="Label" parent="Area2DTown"]
+margin_left = 506.474
+margin_top = 108.32
+margin_right = 529.474
+margin_bottom = 122.32
+rect_pivot_offset = Vector2( 24, 7 )
+text = "0"
+
+[node name="FoodCountLabel" type="Label" parent="Area2DTown"]
+margin_left = 506.474
+margin_top = 121.0
+margin_right = 529.474
+margin_bottom = 135.0
+rect_pivot_offset = Vector2( 24, 7 )
+text = "0"
+
+[node name="AmmoCountLabel" type="Label" parent="Area2DTown"]
+margin_left = 506.474
+margin_top = 133.68
+margin_right = 529.474
+margin_bottom = 147.68
+rect_pivot_offset = Vector2( 24, 7 )
+text = "0"
+[connection signal="body_entered" from="Area2DTown" to="Area2DTown" method="_on_Area2D_body_entered"]

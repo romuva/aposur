@@ -1,0 +1,244 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://player/Player.gd" type="Script" id=1]
+[ext_resource path="res://player/character.png" type="Texture" id=2]
+[ext_resource path="res://interface/GUI.tscn" type="PackedScene" id=3]
+[ext_resource path="res://list.png" type="Texture" id=4]
+[ext_resource path="res://player/Area2DList.gd" type="Script" id=5]
+[ext_resource path="res://player/ListMenu.png" type="Texture" id=6]
+[ext_resource path="res://Inventory.gd" type="Script" id=7]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 13.4045
+
+[sub_resource type="StreamTexture" id=2]
+flags = 4
+
+[sub_resource type="CircleShape2D" id=3]
+radius = 27.1822
+
+[node name="Player" type="KinematicBody2D" groups=[
+"players",
+]]
+script = ExtResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 2 )
+
+[node name="Shadow" type="Sprite" parent="."]
+position = Vector2( 0, 57.4676 )
+z_index = -1
+texture = SubResource( 2 )
+
+[node name="GUI" parent="." instance=ExtResource( 3 )]
+margin_left = -77.735
+margin_top = -53.0
+margin_right = 78.265
+margin_bottom = 54.0
+
+[node name="RespawnTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+drag_margin_left = 0.0
+drag_margin_top = 0.0
+drag_margin_right = 0.0
+drag_margin_bottom = 0.0
+editor_draw_drag_margin = true
+
+[node name="StatsLabel" type="Label" parent="."]
+margin_left = -495.0
+margin_top = -291.0
+margin_right = -401.0
+margin_bottom = -262.0
+text = "STATS"
+align = 1
+
+[node name="HealthLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.58673
+margin_top = 20.9501
+margin_right = 45.4133
+margin_bottom = 50.0571
+text = "Health:"
+
+[node name="HealthCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 39.7944
+margin_top = 21.0
+margin_right = 94.7944
+margin_bottom = 35.0
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="WaterLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.58673
+margin_top = 35.165
+margin_right = 45.4133
+margin_bottom = 50.057
+text = "Water:"
+
+[node name="WaterCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 40.0
+margin_top = 35.0
+margin_right = 95.0
+margin_bottom = 49.0
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="FoodLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.72168
+margin_top = 50.3
+margin_right = 45.2783
+margin_bottom = 64.3
+text = "Food:"
+
+[node name="FoodCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 39.0
+margin_top = 50.0
+margin_right = 95.0
+margin_bottom = 64.0
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="AmmoLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.72168
+margin_top = 62.847
+margin_right = 45.2783
+margin_bottom = 76.847
+text = "Ammo:"
+
+[node name="AmmoCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 41.0
+margin_top = 63.0
+margin_right = 95.0
+margin_bottom = 77.0
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="SpeedLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.72168
+margin_top = 93.6471
+margin_right = 45.2783
+margin_bottom = 107.647
+text = "Speed:"
+
+[node name="SpeedCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 37.0
+margin_top = 93.0
+margin_right = 95.0
+margin_bottom = 107.0
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="FPSLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.72168
+margin_top = 121.387
+margin_right = 45.2783
+margin_bottom = 135.387
+text = "FPS:"
+
+[node name="FPSCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 35.0
+margin_top = 121.0
+margin_right = 95.0
+margin_bottom = 135.0
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="PlayersLabel" type="Label" parent="StatsLabel"]
+margin_left = -5.72168
+margin_top = 136.085
+margin_right = 45.2783
+margin_bottom = 150.085
+text = "Players:"
+
+[node name="PlayersCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 35.0
+margin_top = 135.698
+margin_right = 95.0
+margin_bottom = 149.698
+rect_pivot_offset = Vector2( 8, 20 )
+text = "0"
+align = 2
+
+[node name="ListIcon" type="Sprite" parent="."]
+position = Vector2( 471.97, -263.56 )
+texture = ExtResource( 4 )
+
+[node name="Area2DList" type="Area2D" parent="ListIcon"]
+script = ExtResource( 5 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ListIcon/Area2DList"]
+shape = SubResource( 3 )
+
+[node name="ListMenu" type="Sprite" parent="."]
+visible = false
+position = Vector2( 0.541504, 0.467163 )
+texture = ExtResource( 6 )
+
+[node name="Label" type="Label" parent="ListMenu"]
+margin_left = -19.1606
+margin_top = -141.083
+margin_right = 20.8394
+margin_bottom = -127.083
+rect_pivot_offset = Vector2( 34.6191, 30.6902 )
+text = "Build"
+
+[node name="Button" type="Button" parent="ListMenu"]
+margin_left = -56.5595
+margin_top = -110.393
+margin_right = 62.4405
+margin_bottom = -90.393
+rect_pivot_offset = Vector2( 59.5, 52.9857 )
+text = "Well (Water)"
+
+[node name="Button2" type="Button" parent="ListMenu"]
+margin_left = -56.5595
+margin_top = -85.1831
+margin_right = 62.4405
+margin_bottom = -65.1831
+rect_pivot_offset = Vector2( 59.5, 52.9857 )
+text = "Farm (Food)"
+
+[node name="Button3" type="Button" parent="ListMenu"]
+margin_left = -56.5595
+margin_top = -56.656
+margin_right = 62.4405
+margin_bottom = -36.656
+rect_pivot_offset = Vector2( 59.5, 52.9857 )
+text = "Factory (Ammo)"
+
+[node name="InventoryLabel" type="Label" parent="ListMenu"]
+margin_left = -200.0
+margin_top = -100.0
+margin_right = -139.0
+margin_bottom = -86.0
+rect_pivot_offset = Vector2( 34.6191, 30.6902 )
+text = "Inventory"
+
+[node name="Panel" type="Panel" parent="ListMenu"]
+margin_left = -250.0
+margin_top = -80.0
+margin_right = -90.0
+margin_bottom = 120.0
+mouse_filter = 2
+
+[node name="GridContainer" type="GridContainer" parent="ListMenu/Panel"]
+margin_left = 6.0
+margin_top = 7.0
+margin_right = 154.0
+margin_bottom = 193.0
+columns = 4
+script = ExtResource( 7 )
+[connection signal="timeout" from="RespawnTimer" to="." method="_on_RespawnTimer_timeout"]
+[connection signal="mouse_entered" from="ListIcon/Area2DList" to="ListIcon/Area2DList" method="_on_Area2DList_mouse_entered"]
+[connection signal="mouse_exited" from="ListIcon/Area2DList" to="ListIcon/Area2DList" method="_on_Area2DList_mouse_exited"]
