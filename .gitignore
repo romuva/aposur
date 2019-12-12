@@ -9,4 +9,5 @@ export_presets.cfg
 
 *.exe
 *.pck
+*.7z
 Database/*.bin
