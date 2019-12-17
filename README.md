@@ -1,7 +1,7 @@
 # aposur
 Apocalypse Survivor
 
-No one knows what year it is and how much time passed since something happened. Just now you try to survive apocalypse and maybe if you are good enough only then you might find your answers.
+  No one knows what year it is and how much time passed since something happened. Just now you try to survive apocalypse and maybe if you are good enough only then you might find your answers.
 
 INSTRUCTIONS
 
