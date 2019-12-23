@@ -109,9 +109,9 @@ func inventory_addItem(itemId:int) -> int:
 	return slot
 
 
-func inventory_removeItem(slot) -> int:
+func inventory_removeItem(slot, isAll = false) -> int:
 	var newAmount = inventory[String(slot)]["amount"] - 1
-	if (newAmount < 1):
+	if (newAmount < 1 || isAll == true):
 		inventory_updateItem(slot, 0, 0)
 		return 0
 	inventory[String(slot)]["amount"] = newAmount
@@ -279,6 +279,13 @@ func _on_ItemMenu_Button_DropItem_pressed() -> void:
 		$Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropItem.set_text("(" + String(newAmount) + ") Drop")
 	update_slot(dropItemSlot)
 
+func _on_ItemMenu_Button_DropAllItem_pressed() -> void:
+	var newAmount = inventory_removeItem(dropItemSlot, true)
+	if (newAmount < 1):
+		$Panel/WindowDialog_ItemMenu.hide()
+	else:
+		$Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropAllItem.set_text("(" + String(newAmount) + ") Drop")
+	update_slot(dropItemSlot)
 
 func _on_Button_Save_pressed() -> void:
 	save_data()

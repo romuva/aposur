@@ -12,14 +12,17 @@ enum MoveDirection { UP, DOWN, LEFT, RIGHT, NONE }
 puppet var slave_position = Vector2()
 puppet var slave_movement = MoveDirection.NONE
 
-var waterCount = MAX_WATER_COUNT
-var foodCount = 10
-var ammoCount = MAX_AMMO_COUNT
+puppet var waterCount = MAX_WATER_COUNT
+puppet var foodCount = 10
+puppet var ammoCount = MAX_AMMO_COUNT
 
-var move_speed = MAX_MOVE_SPEED
-var health_points = MAX_HP
+puppet var move_speed = MAX_MOVE_SPEED
+puppet var health_points = MAX_HP
 
-var is_moving_double_slow = false
+puppet var is_moving_double_slow = false
+
+master var bags = Array()
+master var timers = Array()
 
 func _ready():
 	$StatsLabel/PlayerIDCountLabel.text = var2str(int(name))
@@ -37,6 +40,9 @@ func _ready():
 func _physics_process(delta):
 	var direction = MoveDirection.NONE
 	if is_network_master():
+		if Input.is_action_pressed('die'):
+			_die()
+		
 		if Input.is_action_pressed('left'):
 			direction = MoveDirection.LEFT
 		elif Input.is_action_pressed('right'):
@@ -135,6 +141,26 @@ sync func _die():
 		if child.has_method('hide'):
 			child.hide()
 	$CollisionShape2D.disabled = true
+	rpc("_spawn_bag")
+	
+sync func _spawn_bag():
+	var bagSprite = Sprite.new()
+	bagSprite.texture = load("res://Assets/Images/bag.png")
+	bagSprite.set_global_position($GUI/HealthBar.get_global_position())
+	
+	bags.append(bagSprite)
+	get_node("..").add_child(bagSprite)
+	var timer = Timer.new()
+	timer.wait_time = 60
+	timer.one_shot = true
+	timer.connect("timeout",self,"_on_bag_timer_timeout")
+	add_child(timer)
+	timer.start()
+
+# need fix to delete only one bag not all 2019-12-23
+func _on_bag_timer_timeout():
+	for bag in bags:
+		bag.queue_free()
 
 func _on_RespawnTimer_timeout():
 	set_physics_process(true)

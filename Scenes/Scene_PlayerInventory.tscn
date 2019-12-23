@@ -3,11 +3,11 @@
 [ext_resource path="res://Scripts/Script_PlayerInventory.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Images/icon.png" type="Texture" id=2]
 
-[sub_resource type="StyleBoxEmpty" id=6]
+[sub_resource type="StyleBoxEmpty" id=1]
 
 [sub_resource type="StyleBoxEmpty" id=2]
 
-[sub_resource type="StyleBoxEmpty" id=7]
+[sub_resource type="StyleBoxEmpty" id=3]
 
 [sub_resource type="StyleBoxTexture" id=4]
 
@@ -32,9 +32,9 @@ margin_left = 160.0
 margin_top = 30.0
 margin_right = 760.0
 margin_bottom = 420.0
-custom_styles/selected_focus = SubResource( 6 )
+custom_styles/selected_focus = SubResource( 1 )
 custom_styles/bg_focus = SubResource( 2 )
-custom_styles/cursor_unfocused = SubResource( 7 )
+custom_styles/cursor_unfocused = SubResource( 3 )
 custom_styles/selected = SubResource( 4 )
 custom_styles/bg = SubResource( 5 )
 custom_colors/guide_color = Color( 0, 0, 0, 0 )
@@ -141,7 +141,6 @@ text = "1"
 align = 1
 
 [node name="WindowDialog_ItemMenu" type="WindowDialog" parent="Panel"]
-editor/display_folded = true
 margin_left = 300.0
 margin_top = 130.0
 margin_right = 590.0
@@ -164,11 +163,18 @@ margin_bottom = 170.0
 bbcode_enabled = true
 
 [node name="ItemMenu_Button_DropItem" type="Button" parent="Panel/WindowDialog_ItemMenu"]
-margin_left = 90.0
+margin_left = 31.8307
 margin_top = 190.0
-margin_right = 190.0
+margin_right = 131.831
 margin_bottom = 220.0
 text = "Drop"
+
+[node name="ItemMenu_Button_DropAllItem" type="Button" parent="Panel/WindowDialog_ItemMenu"]
+margin_left = 168.05
+margin_top = 190.735
+margin_right = 268.05
+margin_bottom = 220.735
+text = "Drop All"
 [connection signal="item_rmb_selected" from="Panel/ItemList" to="." method="_on_ItemList_item_rmb_selected"]
 [connection signal="mouse_entered" from="Panel/ItemList" to="." method="_on_ItemList_mouse_entered"]
 [connection signal="mouse_exited" from="Panel/ItemList" to="." method="_on_ItemList_mouse_exited"]
@@ -180,3 +186,4 @@ text = "Drop"
 [connection signal="pressed" from="Panel/WindowDialog_SplitItemWindow/SplitItemWindow_Button_Cancel" to="." method="_on_SplitItemWindow_Button_Cancel_pressed"]
 [connection signal="value_changed" from="Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount" to="." method="_on_SplitItemWindow_HSlider_Amount_value_changed"]
 [connection signal="pressed" from="Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropItem" to="." method="_on_ItemMenu_Button_DropItem_pressed"]
+[connection signal="pressed" from="Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropAllItem" to="." method="_on_ItemMenu_Button_DropAllItem_pressed"]
