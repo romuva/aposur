@@ -24,6 +24,8 @@ config/icon="res://Assets/Images/icon.png"
 Network="*res://Scripts/Script_Network.gd"
 Global_DataParser="*res://Scripts/Global_DataParser.gd"
 Global_ItemDatabase="*res://Scripts/Global_ItemDatabase.gd"
+Global_MapDatabase="*res://Scripts/Global_MapDatabase.gd"
+Global_Json_Beautifier="*res://Scripts/Global_Json_Beautifier.gd"
 
 [debug]
 

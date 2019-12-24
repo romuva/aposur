@@ -8,6 +8,7 @@ export_presets.cfg
 .mono/
 
 *.exe
+*.apk
 *.pck
 *.7z
 Database/*.bin

@@ -184,6 +184,7 @@ func init(nickname, start_position, is_slave):
 	$GUI/Nickname.text = nickname
 	global_position = start_position
 	$ListMenu/Control.load_player_data(nickname)
+	$ListMenu/Control/Panel.load_town_data("Alkubra")
 #	if is_slave:
 #		$Sprite.texture = load('res://player/character-alt.png')
 	if is_network_master():

@@ -14,5 +14,5 @@ func load_data(url) -> Dictionary:
 func write_data(url:String, dict:Dictionary):
 	if url == null: return
 	file.open(url, File.WRITE)
-	file.store_line(to_json(dict))
+	file.store_line(Global_Json_Beautifier.beautify_json(to_json(dict)))
 	file.close()

@@ -1,9 +1,9 @@
-extends Control
+extends Panel
 
-var url_PlayerData:String
+var url_TownData:String
 var inventory:Dictionary = {}
 var inventory_maxSlots:int = 20
-var playerData:Dictionary
+var townData:Dictionary
 
 var activeItemSlot:int = -1
 var dropItemSlot:int = -1
@@ -22,34 +22,34 @@ func _ready() -> void:
 #	load_player_data()
 	
 	# Initialize Item List
-	$Panel/ItemList.set_max_columns(10)
-	$Panel/ItemList.set_fixed_icon_size(Vector2(48,48))
-	$Panel/ItemList.set_icon_mode($Panel/ItemList.ICON_MODE_TOP)
-	$Panel/ItemList.set_select_mode($Panel/ItemList.SELECT_SINGLE)
-	$Panel/ItemList.set_same_column_width(true)
-	$Panel/ItemList.set_allow_rmb_select(true)
+	$ItemList2.set_max_columns(10)
+	$ItemList2.set_fixed_icon_size(Vector2(48,48))
+	$ItemList2.set_icon_mode($ItemList2.ICON_MODE_TOP)
+	$ItemList2.set_select_mode($ItemList2.SELECT_SINGLE)
+	$ItemList2.set_same_column_width(true)
+	$ItemList2.set_allow_rmb_select(true)
 
 	set_process(false)
 	set_process_input(true)
 
-func load_player_data(nickname:String) -> void:
+func load_town_data(town_name:String) -> void:
 #	print(""+get_parent().get_parent().get_node("GUI/Nickname").text)
-	url_PlayerData = "res://Database//PlayerData_" + nickname + ".json"
-	playerData = Global_DataParser.load_data(url_PlayerData)
-	if (playerData.empty()):
+	url_TownData = "res://Database//TownData_" + town_name + ".json"
+	townData = Global_DataParser.load_data(url_TownData)
+	if (townData.empty()):
 		var dict:Dictionary = {"inventory":{}}
 		for slot in range (0, inventory_maxSlots):
 			dict["inventory"][str(slot)] = {"id": "0", "amount": 0}
-		Global_DataParser.write_data(url_PlayerData, dict)
+		Global_DataParser.write_data(url_TownData, dict)
 		inventory = dict["inventory"]
-		playerData = dict
+		townData = dict
 	else:
-		inventory = playerData["inventory"]
+		inventory = townData["inventory"]
 	load_items()
 
 
 func save_data() -> void:
-	Global_DataParser.write_data(url_PlayerData, {"inventory": inventory})
+	Global_DataParser.write_data(url_TownData, {"inventory": inventory})
 
 func inventory_getItem(slot:int):
 	if(!inventory.empty()):
@@ -165,8 +165,7 @@ func inventory_moveItem(fromSlot:int, toSlot:int) -> void:
 #warning-ignore:unused_argument
 func _process(delta) -> void:
 	if (isDraggingItem):
-		$Panel/Sprite_DraggedItem.global_position = get_viewport().get_mouse_position()
-
+		$Sprite_DraggedItem.global_position = get_viewport().get_mouse_position()
 
 func _input(event) -> void:
 	if (!isDraggingItem):
@@ -189,12 +188,12 @@ func _input(event) -> void:
 					begin_split_item()
 	if (event is InputEventMouseMotion):
 		if (cursor_insideItemList):
-			activeItemSlot = $Panel/ItemList.get_item_at_position($Panel/ItemList.get_local_mouse_position(),true)
+			activeItemSlot = $ItemList2.get_item_at_position($ItemList2.get_local_mouse_position(),true)
 			if (activeItemSlot >= 0):
-				$Panel/ItemList.select(activeItemSlot, true)
+				$ItemList2.select(activeItemSlot, true)
 				if (isDraggingItem or mouseButtonReleased):
 					return
-				if (!$Panel/ItemList.is_item_selectable(activeItemSlot)):
+				if (!$ItemList2.is_item_selectable(activeItemSlot)):
 					end_drag_item()
 				if (initial_mousePos.distance_to(get_viewport().get_mouse_position()) > 0.0):
 					begin_drag_item(activeItemSlot)
@@ -203,16 +202,16 @@ func _input(event) -> void:
 
 
 func load_items() -> void:
-	$Panel/ItemList.clear()
+	$ItemList2.clear()
 	for slot in range(0, inventory_maxSlots):
-		$Panel/ItemList.add_item("", null, false)
+		$ItemList2.add_item("", null, false)
 		update_slot(slot)
 
 
 func update_slot(slot:int) -> void:
 	if (slot < 0):
 		return
-	var inventoryItem:Dictionary = playerData.inventory[str(slot)]
+	var inventoryItem:Dictionary = townData.inventory[str(slot)]
 	var itemMetaData = Global_ItemDatabase.get_item(str(inventoryItem["id"])).duplicate()
 	var icon = ResourceLoader.load(itemMetaData["icon"])
 	var amount = int(inventoryItem["amount"])
@@ -220,44 +219,44 @@ func update_slot(slot:int) -> void:
 	itemMetaData["amount"] = amount
 	if (!itemMetaData["stackable"]):
 		amount = " "
-	$Panel/ItemList.set_item_text(slot, String(amount))
-	$Panel/ItemList.set_item_icon(slot, icon)
-	$Panel/ItemList.set_item_selectable(slot, int(inventoryItem["id"]) > 0)
-	$Panel/ItemList.set_item_metadata(slot, itemMetaData)
-	$Panel/ItemList.set_item_tooltip(slot, itemMetaData["name"])
-	$Panel/ItemList.set_item_tooltip_enabled(slot, int(inventoryItem["id"]) > 0)
+	$ItemList2.set_item_text(slot, String(amount))
+	$ItemList2.set_item_icon(slot, icon)
+	$ItemList2.set_item_selectable(slot, int(inventoryItem["id"]) > 0)
+	$ItemList2.set_item_metadata(slot, itemMetaData)
+	$ItemList2.set_item_tooltip(slot, itemMetaData["name"])
+	$ItemList2.set_item_tooltip_enabled(slot, int(inventoryItem["id"]) > 0)
 
 func _on_Button_AddItem_pressed() -> void:
 #	Need to fix this later ^^
-	$Panel/WindowDialog_AddItemWindow.rect_global_position = get_parent().get_parent().get_node("Camera2D").get_camera_position()
-	$Panel/WindowDialog_AddItemWindow.popup()
+	$WindowDialog_AddItemWindow.rect_global_position = get_parent().get_parent().get_node("Camera2D").get_camera_position()
+	$WindowDialog_AddItemWindow.popup()
 
 
 func _on_AddItemWindow_Button_Close_pressed() -> void:
-	$Panel/WindowDialog_AddItemWindow.hide()
+	$WindowDialog_AddItemWindow.hide()
 
 
 func _on_AddItemWindow_Button_AddItem_pressed() -> void:
-	var affectedSlot = inventory_addItem($Panel/WindowDialog_AddItemWindow/AddItemWindow_SpinBox_ItemID.get_value())
+	var affectedSlot = inventory_addItem($WindowDialog_AddItemWindow/AddItemWindow_SpinBox_ItemID.get_value())
 	if (affectedSlot >= 0):
 		update_slot(affectedSlot)
 
 
 #warning-ignore:unused_argument
-func _on_ItemList_item_rmb_selected(index:int, atpos:Vector2) -> void:
+func _on_ItemList2_item_rmb_selected(index:int, atpos:Vector2) -> void:
 	if (isDraggingItem):
 		return
 	if (isAwaitingSplit):
 		return
 
 	dropItemSlot = index
-	var itemData:Dictionary = $Panel/ItemList.get_item_metadata(index)
+	var itemData:Dictionary = $ItemList2.get_item_metadata(index)
 	if (int(itemData["id"])) < 1: return
 	var strItemInfo:String = ""
 
-	$Panel/WindowDialog_ItemMenu.set_position(get_viewport().get_mouse_position())
-	$Panel/WindowDialog_ItemMenu.set_title(itemData["name"])
-	$Panel/WindowDialog_ItemMenu/ItemMenu_TextureFrame_Icon.set_texture($Panel/ItemList.get_item_icon(index))
+	$WindowDialog_ItemMenu.set_position(get_viewport().get_mouse_position())
+	$WindowDialog_ItemMenu.set_title(itemData["name"])
+	$WindowDialog_ItemMenu/ItemMenu_TextureFrame_Icon.set_texture($ItemList2.get_item_icon(index))
 
 	strItemInfo = "Name: [color=#00aedb] " + itemData["name"] + "[/color]\n"
 	strItemInfo = strItemInfo + "Type: [color=#f37735] " + itemData["type"] + "[/color]\n"
@@ -265,26 +264,26 @@ func _on_ItemList_item_rmb_selected(index:int, atpos:Vector2) -> void:
 	strItemInfo = strItemInfo + "Sell Price: [color=#ffc425] " + String(itemData["sell_price"]) + "[/color] gold\n"
 	strItemInfo = strItemInfo + "\n[color=#b3cde0]" + itemData["description"] + "[/color]"
 
-	$Panel/WindowDialog_ItemMenu/ItemMenu_RichTextLabel_ItemInfo.set_bbcode(strItemInfo)
-	$Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropItem.set_text("(" + String(itemData["amount"]) + ") Drop" )
+	$WindowDialog_ItemMenu/ItemMenu_RichTextLabel_ItemInfo.set_bbcode(strItemInfo)
+	$WindowDialog_ItemMenu/ItemMenu_Button_DropItem.set_text("(" + String(itemData["amount"]) + ") Drop" )
 	activeItemSlot = index
-	$Panel/WindowDialog_ItemMenu.popup()
+	$WindowDialog_ItemMenu.popup()
 
 
 func _on_ItemMenu_Button_DropItem_pressed() -> void:
 	var newAmount = inventory_removeItem(dropItemSlot)
 	if (newAmount < 1):
-		$Panel/WindowDialog_ItemMenu.hide()
+		$WindowDialog_ItemMenu.hide()
 	else:
-		$Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropItem.set_text("(" + String(newAmount) + ") Drop")
+		$WindowDialog_ItemMenu/ItemMenu_Button_DropItem.set_text("(" + String(newAmount) + ") Drop")
 	update_slot(dropItemSlot)
 
 func _on_ItemMenu_Button_DropAllItem_pressed() -> void:
 	var newAmount = inventory_removeItem(dropItemSlot, true)
 	if (newAmount < 1):
-		$Panel/WindowDialog_ItemMenu.hide()
+		$WindowDialog_ItemMenu.hide()
 	else:
-		$Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropAllItem.set_text("(" + String(newAmount) + ") Drop")
+		$WindowDialog_ItemMenu/ItemMenu_Button_DropAllItem.set_text("(" + String(newAmount) + ") Drop")
 	update_slot(dropItemSlot)
 
 func _on_Button_Save_pressed() -> void:
@@ -294,20 +293,20 @@ func begin_split_item() -> void:
 	if activeItemSlot < 0:
 		return
 	splitItemSlot = activeItemSlot
-	var itemMetaData = $Panel/ItemList.get_item_metadata(splitItemSlot)
+	var itemMetaData = $ItemList2.get_item_metadata(splitItemSlot)
 	var availableAmount = int(itemMetaData["amount"])
 	if (availableAmount > 1):
-		$Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.min_value = 1
-		$Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.max_value = availableAmount -1
-		$Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.value = 1
-		$Panel/WindowDialog_SplitItemWindow.popup()
+		$WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.min_value = 1
+		$WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.max_value = availableAmount -1
+		$WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.value = 1
+		$WindowDialog_SplitItemWindow.popup()
 
 
 func _on_SplitItemWindow_Button_Split_pressed() -> void:
-	update_slot(inventory_splitItem(splitItemSlot, int($Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.value)))
+	update_slot(inventory_splitItem(splitItemSlot, int($WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount.value)))
 	update_slot(splitItemSlot)
 	splitItemSlot = -1
-	$Panel/WindowDialog_SplitItemWindow.hide()
+	$WindowDialog_SplitItemWindow.hide()
 
 
 func begin_drag_item(index:int) -> void:
@@ -317,22 +316,22 @@ func begin_drag_item(index:int) -> void:
 		return
 
 	set_process(true)
-	$Panel/Sprite_DraggedItem.texture = $Panel/ItemList.get_item_icon(index)
-	$Panel/Sprite_DraggedItem.show()
+	$Sprite_DraggedItem.texture = $ItemList2.get_item_icon(index)
+	$Sprite_DraggedItem.show()
 
-	$Panel/ItemList.set_item_text(index, " ")
-	$Panel/ItemList.set_item_icon(index, ResourceLoader.load(Global_ItemDatabase.get_item("0")["icon"]))
+	$ItemList2.set_item_text(index, " ")
+	$ItemList2.set_item_icon(index, ResourceLoader.load(Global_ItemDatabase.get_item("0")["icon"]))
 
 	draggedItemSlot = index
 	isDraggingItem = true
 	mouseButtonReleased = false
-	$Panel/Sprite_DraggedItem.global_translate(get_viewport().get_mouse_position())
+	$Sprite_DraggedItem.global_translate(get_viewport().get_mouse_position())
 
 
 func end_drag_item() -> void:
 	set_process(false)
 	draggedItemSlot = -1
-	$Panel/Sprite_DraggedItem.hide()
+	$Sprite_DraggedItem.hide()
 	mouseButtonReleased = true
 	isDraggingItem = false
 	activeItemSlot = -1
@@ -348,8 +347,8 @@ func move_merge_item() -> void:
 	if (activeItemSlot == draggedItemSlot):
 		update_slot(draggedItemSlot)
 	else:
-		if ($Panel/ItemList.get_item_metadata(activeItemSlot)["id"] == $Panel/ItemList.get_item_metadata(draggedItemSlot)["id"]):
-			var itemData = $Panel/ItemList.get_item_metadata(activeItemSlot)
+		if ($ItemList2.get_item_metadata(activeItemSlot)["id"] == $ItemList2.get_item_metadata(draggedItemSlot)["id"]):
+			var itemData = $ItemList2.get_item_metadata(activeItemSlot)
 			if (int(itemData["stack_limit"]) >= 2):
 				inventory_mergeItem(draggedItemSlot, activeItemSlot)
 				update_slot(draggedItemSlot)
@@ -364,18 +363,16 @@ func move_merge_item() -> void:
 			update_slot(activeItemSlot)
 
 
-func _on_ItemList_mouse_entered() -> void:
+func _on_ItemList2_mouse_entered() -> void:
 	cursor_insideItemList = true;
 
 
-func _on_ItemList_mouse_exited() -> void:
+func _on_ItemList2_mouse_exited() -> void:
 	cursor_insideItemList = false;
 
 func _on_SplitItemWindow_Button_Cancel_pressed() -> void:
-	$Panel/WindowDialog_SplitItemWindow.hide()
+	$WindowDialog_SplitItemWindow.hide()
 
 
 func _on_SplitItemWindow_HSlider_Amount_value_changed(value:int) -> void:
-	$Panel/WindowDialog_SplitItemWindow/SplitItemWindow_Label_Amount.text = String(value)
-
-
+	$WindowDialog_SplitItemWindow/SplitItemWindow_Label_Amount.text = String(value)
