@@ -638,8 +638,9 @@ func _on_Button_SellBuy_pressed():
 		
 		if(amount > int(inventory_get_item_by_slot_player(slot_id_item_player).amount)): return
 		
+		print(item_id_money_player)
 		inventory_add_item_player(item_id_money_player, amount)
-		print(inventory_add_item_shop(item_id_shop, amount))
+		inventory_add_item_shop(item_id_shop, amount)
 		inventory_remove_item_player(slot_id_item_player, false, amount)
 		inventory_remove_item_shop(slot_id_money_shop, false, amount)
 		update_slot_player(slot_id_money_player)
