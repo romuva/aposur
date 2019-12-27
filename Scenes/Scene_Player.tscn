@@ -178,6 +178,38 @@ rect_pivot_offset = Vector2( 8, 20 )
 text = "0"
 align = 2
 
+[node name="LoadLabel" type="Label" parent="StatsLabel"]
+margin_left = 2.78191
+margin_top = 557.22
+margin_right = 42.7819
+margin_bottom = 571.22
+rect_pivot_offset = Vector2( 130, 33.7847 )
+text = "Load:"
+
+[node name="LoadCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 39.3908
+margin_top = 557.22
+margin_right = 79.3908
+margin_bottom = 571.22
+rect_pivot_offset = Vector2( 40, 33.7847 )
+text = "0/0kg"
+
+[node name="MoneyLabel" type="Label" parent="StatsLabel"]
+margin_left = 465.473
+margin_top = 557.22
+margin_right = 512.473
+margin_bottom = 571.22
+rect_pivot_offset = Vector2( 130, 33.7847 )
+text = "Money:"
+
+[node name="MoneyCountLabel" type="Label" parent="StatsLabel"]
+margin_left = 515.114
+margin_top = 557.22
+margin_right = 555.114
+margin_bottom = 571.22
+rect_pivot_offset = Vector2( 40, 33.7847 )
+text = "0"
+
 [node name="ListIcon" type="Sprite" parent="."]
 position = Vector2( 471.97, -263.56 )
 texture = ExtResource( 4 )

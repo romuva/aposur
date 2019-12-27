@@ -22,14 +22,14 @@
 	},
 	
 	"2": {
-		"name": "Angle Grinder",
-		"icon": "res://Database/Item_Icons/genericItem_color_002.png",
-		"type": "equipment",
-		"weight": 10.5,
-		"stackable": false,
-		"stack_limit": 1,
-		"description": "Also known as a side grinder or disc grinder, is a handheld power tool used for grinding and polishing.",
-		"sell_price": 111
+		"name": "AK-47",
+		"icon": "res://Database/Item_Icons/ak-47.png",
+		"type": "gun",
+		"weight": 4,
+		"stackable": true,
+		"stack_limit": 9999999,
+		"description": "Most sold assault rifle in a world.\nAmmo: 7.62×39mm",
+		"sell_price": 1
 	},
 	
 	"3": {

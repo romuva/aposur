@@ -40,7 +40,8 @@ func _update_town_labels():
 		rset('ammoCount', ammoCount)
 
 func _on_Area2D_body_entered(body):
-	print(body)
+	body.town_entered()
+	
 	if(waterCount + body.waterCount <= body.MAX_WATER_COUNT):
 		body.waterCount += waterCount
 		waterCount = 0
@@ -64,3 +65,7 @@ func _on_Area2D_body_entered(body):
 	
 	body._update_item_labels()
 	_update_town_labels()
+
+
+func _on_Area2DTown_body_exited(body):
+	body.town_exited()

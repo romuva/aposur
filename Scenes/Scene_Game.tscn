@@ -79,3 +79,4 @@ margin_bottom = 147.68
 rect_pivot_offset = Vector2( 24, 7 )
 text = "0"
 [connection signal="body_entered" from="Area2DTown" to="Area2DTown" method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Area2DTown" to="Area2DTown" method="_on_Area2DTown_body_exited"]

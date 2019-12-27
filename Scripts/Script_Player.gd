@@ -25,6 +25,7 @@ master var bags = Array()
 master var timers = Array()
 
 func _ready():
+	
 	$StatsLabel/PlayerIDCountLabel.text = var2str(int(name))
 	
 	_update_health_bar()
@@ -36,6 +37,7 @@ func _ready():
 	else:
 		$ListIcon.visible = false
 		$StatsLabel.visible = false
+
 
 func _physics_process(delta):
 	var direction = MoveDirection.NONE
@@ -84,6 +86,8 @@ func _physics_process(delta):
 			is_moving_double_slow = true
 			move_speed = move_speed / 2
 		_no_food_left()
+	update_player_money()
+
 
 func _move(direction):
 	match direction:
@@ -106,8 +110,8 @@ func _update_health_bar():
 	$GUI/HealthBar.value = health_points
 
 func _update_item_labels():
-	if($ListMenu/Control.inventory_getItemById(1)):
-		foodCount = $ListMenu/Control.inventory_getItemById(1).amount
+	if($ListMenu/Control.inventory_get_item_by_id_player(1)):
+		foodCount = $ListMenu/Control.inventory_get_item_by_id_player(1).amount
 	
 	$StatsLabel/HealthCountLabel.text = var2str(int(health_points)) + "/" + var2str(int(MAX_HP))
 	$StatsLabel/WaterCountLabel.text = var2str(int(waterCount)) + "/" + var2str(int(MAX_WATER_COUNT))
@@ -183,9 +187,26 @@ func _no_ammo_left():
 func init(nickname, start_position, is_slave):
 	$GUI/Nickname.text = nickname
 	global_position = start_position
-	$ListMenu/Control.load_player_data(nickname)
-	$ListMenu/Control/Panel.load_town_data("Alkubra")
+	
+	$ListMenu/Control.load_data_player(nickname)
+	$ListMenu/Control.load_data_shop("Alkubra")
+
 #	if is_slave:
 #		$Sprite.texture = load('res://player/character-alt.png')
 	if is_network_master():
 		$Camera2D.current = 1
+
+func town_entered():
+	$ListIcon.modulate = Color(1,1,0,0.5)
+
+
+func town_exited():
+	$ListIcon.modulate = Color(1,1,1,0.5)
+
+func update_player_money():
+	var money_count
+	if($ListMenu/Control.inventory_get_item_by_id_player(1)):
+		money_count = $ListMenu/Control.inventory_get_item_by_id_player(1).amount
+	else:
+		money_count = 0
+	$StatsLabel/MoneyCountLabel.set_text(var2str(int(money_count)))

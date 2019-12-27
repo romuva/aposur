@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Scripts/Script_PlayerInventory.gd" type="Script" id=1]
-[ext_resource path="res://Scripts/Script_ShopInventory.gd" type="Script" id=2]
-[ext_resource path="res://Assets/Images/icon.png" type="Texture" id=3]
+[ext_resource path="res://Assets/Images/icon.png" type="Texture" id=2]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
@@ -15,7 +14,7 @@
 [sub_resource type="StyleBoxEmpty" id=5]
 
 [node name="Control" type="Control"]
-modulate = Color( 1, 1, 1, 0.882353 )
+modulate = Color( 1, 1, 1, 0.960784 )
 rect_scale = Vector2( 0.998334, 1 )
 rect_pivot_offset = Vector2( -220, -210 )
 script = ExtResource( 1 )
@@ -25,7 +24,6 @@ margin_left = 60.4673
 margin_top = 50.0
 margin_right = 960.467
 margin_bottom = 550.0
-script = ExtResource( 2 )
 
 [node name="Sprite_DraggedItem" type="Sprite" parent="Panel"]
 visible = false
@@ -45,16 +43,17 @@ custom_styles/bg = SubResource( 5 )
 custom_colors/guide_color = Color( 0, 0, 0, 0 )
 custom_constants/vseparation = 10
 custom_constants/hseparation = 15
+allow_reselect = true
 auto_height = true
-max_columns = 0
+max_columns = 4
 same_column_width = true
 icon_mode = 0
 fixed_icon_size = Vector2( 48, 48 )
 
 [node name="ItemList2" type="ItemList" parent="Panel"]
-margin_left = 601.001
+margin_left = 631.0
 margin_top = 30.0
-margin_right = 872.001
+margin_right = 900.0
 margin_bottom = 470.0
 custom_styles/selected_focus = SubResource( 1 )
 custom_styles/bg_focus = SubResource( 2 )
@@ -64,24 +63,32 @@ custom_styles/bg = SubResource( 5 )
 custom_colors/guide_color = Color( 0, 0, 0, 0 )
 custom_constants/vseparation = 10
 custom_constants/hseparation = 15
+allow_reselect = true
 auto_height = true
-max_columns = 0
+max_columns = 4
 same_column_width = true
 icon_mode = 0
 fixed_icon_size = Vector2( 48, 48 )
 
 [node name="Button_Save" type="Button" parent="Panel"]
-margin_left = 300.0
+margin_left = 10.0166
 margin_top = 440.0
-margin_right = 390.0
+margin_right = 100.017
 margin_bottom = 490.0
 text = "Save"
 
+[node name="Button_SellBuy" type="Button" parent="Panel"]
+margin_left = 410.684
+margin_top = 440.0
+margin_right = 500.684
+margin_bottom = 490.0
+shortcut_in_tooltip = false
+
 [node name="Button_AddItem" type="Button" parent="Panel"]
 modulate = Color( 1, 1, 1, 0.882353 )
-margin_left = 400.668
+margin_left = 110.685
 margin_top = 440.0
-margin_right = 490.668
+margin_right = 200.685
 margin_bottom = 490.0
 text = "Add Item"
 
@@ -176,7 +183,7 @@ margin_left = 120.0
 margin_top = 10.0
 margin_right = 168.0
 margin_bottom = 58.0
-texture = ExtResource( 3 )
+texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
@@ -209,19 +216,76 @@ margin_bottom = 28.0
 text = "Inventory"
 
 [node name="Label2" type="Label" parent="Panel"]
-margin_left = 671.118
-margin_top = 14.0
-margin_right = 732.118
-margin_bottom = 28.0
+margin_left = 731.218
+margin_top = 10.0
+margin_right = 792.218
+margin_bottom = 24.0
 text = "Shop"
 align = 2
+
+[node name="SelectedItemIconSprite" type="Sprite" parent="Panel"]
+position = Vector2( 449.749, 125 )
+
+[node name="SelectedItemNameLabel" type="Label" parent="Panel"]
+margin_left = 430.718
+margin_top = 83.0
+margin_right = 470.718
+margin_bottom = 97.0
+grow_horizontal = 2
+align = 1
+
+[node name="CountLabel" type="Label" parent="Panel"]
+margin_left = 400.668
+margin_top = 153.0
+margin_right = 500.668
+margin_bottom = 167.0
+grow_vertical = 2
+align = 1
+
+[node name="PriceLabel" type="Label" parent="Panel"]
+margin_left = 380.634
+margin_top = 193.0
+margin_right = 520.634
+margin_bottom = 207.0
+grow_horizontal = 2
+
+[node name="WeightLabel" type="Label" parent="Panel"]
+margin_left = 380.634
+margin_top = 212.0
+margin_right = 521.634
+margin_bottom = 226.0
+grow_horizontal = 2
+
+[node name="DescriptionLabel" type="Label" parent="Panel"]
+margin_left = 381.0
+margin_top = 270.0
+margin_right = 522.0
+margin_bottom = 325.0
+grow_horizontal = 2
+
+[node name="HSlider" type="HSlider" parent="Panel"]
+margin_left = 300.0
+margin_top = 370.0
+margin_right = 601.0
+margin_bottom = 426.0
+max_value = 0.0
+ticks_on_borders = true
+
+[node name="LineEdit" type="LineEdit" parent="Panel"]
+margin_left = 420.701
+margin_top = 340.0
+margin_right = 478.701
+margin_bottom = 364.0
+align = 1
 [connection signal="item_rmb_selected" from="Panel/ItemList" to="." method="_on_ItemList_item_rmb_selected"]
+[connection signal="item_selected" from="Panel/ItemList" to="." method="_on_ItemList_item_selected"]
 [connection signal="mouse_entered" from="Panel/ItemList" to="." method="_on_ItemList_mouse_entered"]
 [connection signal="mouse_exited" from="Panel/ItemList" to="." method="_on_ItemList_mouse_exited"]
-[connection signal="item_rmb_selected" from="Panel/ItemList2" to="Panel" method="_on_ItemList2_item_rmb_selected"]
-[connection signal="mouse_entered" from="Panel/ItemList2" to="Panel" method="_on_ItemList2_mouse_entered"]
-[connection signal="mouse_exited" from="Panel/ItemList2" to="Panel" method="_on_ItemList2_mouse_exited"]
+[connection signal="item_selected" from="Panel/ItemList2" to="." method="_on_ItemList2_item_selected"]
+[connection signal="mouse_entered" from="Panel/ItemList2" to="." method="_on_ItemList2_mouse_entered"]
+[connection signal="mouse_exited" from="Panel/ItemList2" to="." method="_on_ItemList2_mouse_exited"]
 [connection signal="pressed" from="Panel/Button_Save" to="." method="_on_Button_Save_pressed"]
+[connection signal="pressed" from="Panel/Button_SellBuy" to="." method="_on_Button_SellBuy_pressed"]
 [connection signal="pressed" from="Panel/Button_AddItem" to="." method="_on_Button_AddItem_pressed"]
 [connection signal="pressed" from="Panel/WindowDialog_AddItemWindow/AddItemWindow_Button_AddItem" to="." method="_on_AddItemWindow_Button_AddItem_pressed"]
 [connection signal="pressed" from="Panel/WindowDialog_AddItemWindow/AddItemWindow_Button_Close" to="." method="_on_AddItemWindow_Button_Close_pressed"]
@@ -230,3 +294,4 @@ align = 2
 [connection signal="value_changed" from="Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount" to="." method="_on_SplitItemWindow_HSlider_Amount_value_changed"]
 [connection signal="pressed" from="Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropItem" to="." method="_on_ItemMenu_Button_DropItem_pressed"]
 [connection signal="pressed" from="Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropAllItem" to="." method="_on_ItemMenu_Button_DropAllItem_pressed"]
+[connection signal="value_changed" from="Panel/HSlider" to="." method="_on_HSlider_value_changed"]

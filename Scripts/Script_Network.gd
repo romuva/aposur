@@ -1,7 +1,7 @@
 extends Node
 
-const DEFAULT_IP = '78.56.108.189' # localhost
-const DEFAULT_PORT = 31400
+const DEFAULT_IP = '127.0.0.1' # localhost
+const DEFAULT_PORT = 4321
 const MAX_PLAYERS = 1000
 
 var players = { }

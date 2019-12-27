@@ -17,20 +17,12 @@ onready var cursor_insideItemList:bool = false
 var isAwaitingSplit:bool = false
 var splitItemSlot:int = -1
 
-func _ready() -> void:
 
-#	load_player_data()
-	
-	# Initialize Item List
-	$ItemList2.set_max_columns(10)
-	$ItemList2.set_fixed_icon_size(Vector2(48,48))
-	$ItemList2.set_icon_mode($ItemList2.ICON_MODE_TOP)
-	$ItemList2.set_select_mode($ItemList2.SELECT_SINGLE)
-	$ItemList2.set_same_column_width(true)
-	$ItemList2.set_allow_rmb_select(true)
+func _ready() -> void:
 
 	set_process(false)
 	set_process_input(true)
+
 
 func load_town_data(town_name:String) -> void:
 #	print(""+get_parent().get_parent().get_node("GUI/Nickname").text)
