@@ -615,10 +615,8 @@ func _on_Button_SellBuy_pressed():
 		inventory_add_item_shop(item_id_money_shop, amount)
 		inventory_remove_item_player(slot_id_money_player, false, amount)
 		inventory_remove_item_shop(slot_id_item_shop, false, amount)
-		update_slot_player(slot_id_money_player)
-		update_slot_shop(slot_id_money_shop)
-		update_slot_player(slot_id_item_player)
-		update_slot_shop(slot_id_item_shop)
+		_update_slots_player()
+		_update_slots_shop()
 		_update_center_content_item($Panel/ItemList2.get_item_metadata(slot_id_item_shop))
 	else:
 		money_shop = inventory_get_item_by_id_shop(1)
@@ -638,13 +636,47 @@ func _on_Button_SellBuy_pressed():
 		
 		if(amount > int(inventory_get_item_by_slot_player(slot_id_item_player).amount)): return
 		
-		print(item_id_money_player)
 		inventory_add_item_player(item_id_money_player, amount)
 		inventory_add_item_shop(item_id_shop, amount)
 		inventory_remove_item_player(slot_id_item_player, false, amount)
 		inventory_remove_item_shop(slot_id_money_shop, false, amount)
-		update_slot_player(slot_id_money_player)
-		update_slot_shop(slot_id_money_shop)
-		update_slot_player(slot_id_item_player)
-		update_slot_shop(slot_id_item_shop)
+		_update_slots_player()
+		_update_slots_shop()
 		_update_center_content_item($Panel/ItemList.get_item_metadata(slot_id_item_player))
+
+func _update_slots_player():
+	for slot in range(0, inventory_max_slots):
+		update_slot_player(int(slot))
+
+func _update_slots_shop():
+	for slot in range(0, inventory_max_slots):
+		update_slot_shop(int(slot))
+
+func _hide_shop() -> void:
+	$Panel/SelectedItemNameLabel.hide()
+	$Panel/SelectedItemIconSprite.hide()
+	$Panel/CountLabel.hide()
+	$Panel/PriceLabel.hide()
+	$Panel/WeightLabel.hide()
+	$Panel/DescriptionLabel.hide()
+	$Panel/HSlider.hide()
+	$Panel/LineEdit.hide()
+	$Panel/Button_SellBuy.hide()
+	
+	$Panel/ItemList2.hide()
+	$Panel/Label2.hide()
+
+
+func _show_shop() -> void:
+	$Panel/SelectedItemNameLabel.show()
+	$Panel/SelectedItemIconSprite.show()
+	$Panel/CountLabel.show()
+	$Panel/PriceLabel.show()
+	$Panel/WeightLabel.show()
+	$Panel/DescriptionLabel.show()
+	$Panel/HSlider.show()
+	$Panel/LineEdit.show()
+	$Panel/Button_SellBuy.show()
+	
+	$Panel/ItemList2.show()
+	$Panel/Label2.show()

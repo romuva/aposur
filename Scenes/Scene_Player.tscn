@@ -1,11 +1,12 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Scripts/Script_Player.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Images/player_skin.png" type="Texture" id=2]
 [ext_resource path="res://Scenes/Scene_Player_GUI.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Assets/Images/list.png" type="Texture" id=4]
-[ext_resource path="res://Scripts/Script_ListMenu.gd" type="Script" id=5]
-[ext_resource path="res://Scenes/Scene_PlayerInventory.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Scenes/Scene_ChatRoom.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Assets/Images/list.png" type="Texture" id=5]
+[ext_resource path="res://Scripts/Script_ListMenu.gd" type="Script" id=6]
+[ext_resource path="res://Scenes/Scene_PlayerInventory.tscn" type="PackedScene" id=7]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 13.4045
@@ -210,12 +211,17 @@ margin_bottom = 571.22
 rect_pivot_offset = Vector2( 40, 33.7847 )
 text = "0"
 
+[node name="ChatRoom" parent="." groups=[
+"Group_ChatRoom",
+] instance=ExtResource( 4 )]
+visible = false
+
 [node name="ListIcon" type="Sprite" parent="."]
 position = Vector2( 471.97, -263.56 )
-texture = ExtResource( 4 )
+texture = ExtResource( 5 )
 
 [node name="Area2DList" type="Area2D" parent="ListIcon"]
-script = ExtResource( 5 )
+script = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ListIcon/Area2DList"]
 shape = SubResource( 2 )
@@ -224,7 +230,7 @@ shape = SubResource( 2 )
 visible = false
 position = Vector2( 0.541504, 0.467163 )
 
-[node name="Control" parent="ListMenu" instance=ExtResource( 6 )]
+[node name="Control" parent="ListMenu" instance=ExtResource( 7 )]
 margin_left = -512.0
 margin_top = -300.0
 [connection signal="timeout" from="RespawnTimer" to="." method="_on_RespawnTimer_timeout"]

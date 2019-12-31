@@ -24,6 +24,8 @@ puppet var is_moving_double_slow = false
 master var bags = Array()
 master var timers = Array()
 
+puppet var is_chat_focused:bool = false
+
 func _ready():
 	
 	$StatsLabel/PlayerIDCountLabel.text = var2str(int(name))
@@ -34,58 +36,62 @@ func _ready():
 	if is_network_master():
 		$ListIcon.visible = true
 		$StatsLabel.visible = true
+		$ChatRoom.visible = true
 	else:
 		$ListIcon.visible = false
 		$StatsLabel.visible = false
+		$ChatRoom.visible = false
 
 
 func _physics_process(delta):
-	var direction = MoveDirection.NONE
-	if is_network_master():
-		if Input.is_action_pressed('die'):
-			_die()
+
+	if(!is_chat_focused):
+		var direction = MoveDirection.NONE
+		if is_network_master():
+			if Input.is_action_pressed('die'):
+				_die()
+			
+			if Input.is_action_pressed('left'):
+				direction = MoveDirection.LEFT
+			elif Input.is_action_pressed('right'):
+				direction = MoveDirection.RIGHT
+			elif Input.is_action_pressed('up'):
+				direction = MoveDirection.UP
+			elif Input.is_action_pressed('down'):
+				direction = MoveDirection.DOWN
+			
+			$StatsLabel/FPSCountLabel.text = var2str(int(Engine.get_frames_per_second()))
+			$StatsLabel/PlayersCountLabel.text = var2str(int(Network.players.size()))
+			
+			rset_unreliable('slave_position', position)
+			rset('slave_movement', direction)
+			_move(direction)
+		else:
+			_move(slave_movement)
+			position = slave_position
 		
-		if Input.is_action_pressed('left'):
-			direction = MoveDirection.LEFT
-		elif Input.is_action_pressed('right'):
-			direction = MoveDirection.RIGHT
-		elif Input.is_action_pressed('up'):
-			direction = MoveDirection.UP
-		elif Input.is_action_pressed('down'):
-			direction = MoveDirection.DOWN
-		
-		$StatsLabel/FPSCountLabel.text = var2str(int(Engine.get_frames_per_second()))
-		$StatsLabel/PlayersCountLabel.text = var2str(int(Network.players.size()))
-		
-		rset_unreliable('slave_position', position)
-		rset('slave_movement', direction)
-		_move(direction)
-	else:
-		_move(slave_movement)
-		position = slave_position
+		if get_tree().is_network_server():
+			Network.update_position(int(name), position)
 	
-	if get_tree().is_network_server():
-		Network.update_position(int(name), position)
-
-	if(waterCount >= 1):
-		waterCount -= delta
-		regen(delta)
-		_update_item_labels()
-	else:
-		damage(delta)
-		_update_item_labels()
-		_no_water_left()
-
-	if(foodCount >= 1):
-		if(is_moving_double_slow):
-			is_moving_double_slow = false
-			move_speed = MAX_MOVE_SPEED
-		_update_item_labels()
-	else:
-		if(!is_moving_double_slow):
-			is_moving_double_slow = true
-			move_speed = move_speed / 2
-		_no_food_left()
+		if(waterCount >= 1):
+			waterCount -= delta
+			regen(delta)
+			_update_item_labels()
+		else:
+			damage(delta)
+			_update_item_labels()
+			_no_water_left()
+	
+		if(foodCount >= 1):
+			if(is_moving_double_slow):
+				is_moving_double_slow = false
+				move_speed = MAX_MOVE_SPEED
+			_update_item_labels()
+		else:
+			if(!is_moving_double_slow):
+				is_moving_double_slow = true
+				move_speed = move_speed / 2
+			_no_food_left()
 	update_player_money()
 
 
@@ -163,8 +169,9 @@ sync func _spawn_bag():
 
 # need fix to delete only one bag not all 2019-12-23
 func _on_bag_timer_timeout():
-	for bag in bags:
-		bag.queue_free()
+#	for bag in bags:
+#		bag.queue_free() it crashes whole game after some time
+	pass
 
 func _on_RespawnTimer_timeout():
 	set_physics_process(true)
@@ -195,13 +202,18 @@ func init(nickname, start_position, is_slave):
 #		$Sprite.texture = load('res://player/character-alt.png')
 	if is_network_master():
 		$Camera2D.current = 1
+		$ChatRoom.host_room()
 
 func town_entered():
 	$ListIcon.modulate = Color(1,1,0,0.5)
+	
+	$ListMenu/Control._show_shop()
 
 
 func town_exited():
 	$ListIcon.modulate = Color(1,1,1,0.5)
+	
+	$ListMenu/Control._hide_shop()
 
 func update_player_money():
 	var money_count
