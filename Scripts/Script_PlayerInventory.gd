@@ -22,6 +22,7 @@ var split_item_slot:int = -1
 
 var is_shop_selected = false
 
+var is_inside_shop = false
 
 func _ready() -> void:
 
@@ -67,6 +68,14 @@ func load_data_shop(name:String) -> void:
 
 func save_data() -> void:
 	Global_DataParser.write_data(url_data_player, {"inventory": inventory_player})
+
+
+func inventory_get_items_count_player() -> int:
+	var count = 0
+	for slot in range(0, inventory_max_slots):
+		if (inventory_player[str(slot)]["id"] != "0"): 
+			count = count + 1
+	return count
 
 
 func inventory_get_item_by_slot_player(slot:int):
@@ -212,6 +221,7 @@ func inventory_remove_item_shop(slot, is_all = false, count:int = 1) -> int:
 
 
 func inventory_update_item_player(slot:int, new_id:int, new_amount:int) -> void:
+	print(var2str(slot)+var2str(new_id)+var2str(new_amount))
 	if (slot < 0):
 		return
 	if (new_amount < 0):
@@ -513,12 +523,15 @@ func _on_SplitItemWindow_HSlider_Amount_value_changed(value:int) -> void:
 
 
 func _on_ItemList_item_selected(index):
+	get_parent().get_parent().foodCount = inventory_get_item_by_id_player(1).amount
+	
 	var item_data:Dictionary = $Panel/ItemList.get_item_metadata(index)
 	if(item_data.name.empty()): return
 	
 	_update_center_content_item(item_data)
 	is_shop_selected = false
-	$Panel/Button_SellBuy.text = "Sell"
+	if(is_inside_shop):
+		$Panel/Button_SellBuyDrop.text = "Sell"
 
 func _on_ItemList2_item_selected(index):
 	var item_data:Dictionary = $Panel/ItemList2.get_item_metadata(index)
@@ -526,7 +539,8 @@ func _on_ItemList2_item_selected(index):
 	
 	_update_center_content_item(item_data)
 	is_shop_selected = true
-	$Panel/Button_SellBuy.text = "Buy"
+	if(is_inside_shop):
+		$Panel/Button_SellBuyDrop.text = "Buy"
 
 
 func _update_center_content_item(item_data:Dictionary) -> void:
@@ -559,7 +573,7 @@ func _hide_center_content_item() -> void:
 	$Panel/DescriptionLabel.hide()
 	$Panel/HSlider.hide()
 	$Panel/LineEdit.hide()
-	$Panel/Button_SellBuy.hide()
+	$Panel/Button_SellBuyDrop.hide()
 
 
 func _show_center_content_item() -> void:
@@ -571,14 +585,15 @@ func _show_center_content_item() -> void:
 	$Panel/DescriptionLabel.show()
 	$Panel/HSlider.show()
 	$Panel/LineEdit.show()
-	$Panel/Button_SellBuy.show()
+	$Panel/Button_SellBuyDrop.show()
 
 
 func _on_HSlider_value_changed(value):
 	$Panel/LineEdit.text = var2str(int(value)).replace('"', '')
 
 
-func _on_Button_SellBuy_pressed():
+func _on_Button_SellBuyDrop_pressed():
+	
 	var selected_items_player = $Panel/ItemList.get_selected_items()
 	var selected_items_shop = $Panel/ItemList2.get_selected_items()
 	
@@ -593,11 +608,17 @@ func _on_Button_SellBuy_pressed():
 
 	var amount = int($Panel/LineEdit.text)
 	if(amount == 0): return
+	if(inventory_get_items_count_player() == 0): return
+	
+	if(!is_inside_shop):
+		slot_id_item_player = int(selected_items_player[0])
+		inventory_remove_item_player(slot_id_item_player, false, amount) # need upgrade so it drops bag sprite with items in it
+		_update_slots_player()
+		_update_center_content_item($Panel/ItemList.get_item_metadata(slot_id_item_player))
+		return
+		
 	if(is_shop_selected):
 		money_player = inventory_get_item_by_id_player(1)
-		if(money_player == null || money_player.amount < amount):
-			print("Not enough money player!")
-			return
 		
 		if(inventory_get_item_by_id_shop(1) == null):
 			slot_id_money_shop = inventory_get_empty_slot_shop()
@@ -607,39 +628,48 @@ func _on_Button_SellBuy_pressed():
 		slot_id_item_shop  = int(selected_items_shop[0])
 			
 		var item_id_money_shop = int(inventory_get_item_by_slot_player(slot_id_money_player).id)
-		var item_id_player= int(inventory_get_item_by_slot_shop(slot_id_item_shop).id)
+		var item_id_player = int(inventory_get_item_by_slot_shop(slot_id_item_shop).id)
 		
-		if(amount > int(inventory_get_item_by_slot_shop(slot_id_item_shop).amount)): return
+		var item_cost_player = Global_ItemDatabase.get_item(var2str(item_id_player)).sell_price
+		
+		if(money_player == null || money_player.amount < amount * item_cost_player):
+			print("Not enough money player!")
+			return
+		
+		if(amount > int(inventory_get_item_by_slot_shop(slot_id_item_shop).amount)): return # protect against same item trade hack
 		
 		inventory_add_item_player(item_id_player, amount)
-		inventory_add_item_shop(item_id_money_shop, amount)
-		inventory_remove_item_player(slot_id_money_player, false, amount)
+		inventory_add_item_shop(item_id_money_shop, amount * item_cost_player)
+		inventory_remove_item_player(slot_id_money_player, false, amount * item_cost_player)
 		inventory_remove_item_shop(slot_id_item_shop, false, amount)
 		_update_slots_player()
 		_update_slots_shop()
 		_update_center_content_item($Panel/ItemList2.get_item_metadata(slot_id_item_shop))
 	else:
 		money_shop = inventory_get_item_by_id_shop(1)
-		if(money_shop == null || money_shop.amount < amount):
-			print("Not enough money shop!")
-			return
 		
 		if(inventory_get_item_by_id_player(1) == null):
 			slot_id_money_player = inventory_get_empty_slot_player()
 		else:
 			slot_id_money_player  = int(inventory_get_slot_by_item_id_player(1))
 		slot_id_money_shop = int(inventory_get_slot_by_item_id_shop(1))
-		slot_id_item_player  = int(selected_items_player[0])
+		slot_id_item_player = int(selected_items_player[0])
 
 		var item_id_money_player = int(inventory_get_item_by_slot_shop(slot_id_money_shop).id)
 		var item_id_shop = int(inventory_get_item_by_slot_player(slot_id_item_player).id)
-		
+
+		var item_cost_shop = Global_ItemDatabase.get_item(var2str(item_id_shop)).sell_price
+
+		if(money_shop == null || money_shop.amount < amount * item_cost_shop):
+			print("Not enough money shop!")
+			return
+
 		if(amount > int(inventory_get_item_by_slot_player(slot_id_item_player).amount)): return
 		
-		inventory_add_item_player(item_id_money_player, amount)
+		inventory_add_item_player(item_id_money_player, amount * item_cost_shop)
 		inventory_add_item_shop(item_id_shop, amount)
 		inventory_remove_item_player(slot_id_item_player, false, amount)
-		inventory_remove_item_shop(slot_id_money_shop, false, amount)
+		inventory_remove_item_shop(slot_id_money_shop, false, amount * item_cost_shop)
 		_update_slots_player()
 		_update_slots_shop()
 		_update_center_content_item($Panel/ItemList.get_item_metadata(slot_id_item_player))
@@ -661,7 +691,9 @@ func _hide_shop() -> void:
 	$Panel/DescriptionLabel.hide()
 	$Panel/HSlider.hide()
 	$Panel/LineEdit.hide()
-	$Panel/Button_SellBuy.hide()
+	$Panel/Button_SellBuyDrop.hide()
+	$Panel/Button_SellBuyDrop.text = "Drop"
+	is_inside_shop = false
 	
 	$Panel/ItemList2.hide()
 	$Panel/Label2.hide()
@@ -676,7 +708,16 @@ func _show_shop() -> void:
 	$Panel/DescriptionLabel.show()
 	$Panel/HSlider.show()
 	$Panel/LineEdit.show()
-	$Panel/Button_SellBuy.show()
+	$Panel/Button_SellBuyDrop.show()
+	$Panel/Button_SellBuyDrop.text = "Sell"
+	is_inside_shop = true
 	
 	$Panel/ItemList2.show()
 	$Panel/Label2.show()
+
+
+func _on_Control_visibility_changed():
+	if(is_visible_in_tree()):
+		get_parent().get_parent().set_is_other_window_focused(true)
+	else:
+		get_parent().get_parent().set_is_other_window_focused(false)

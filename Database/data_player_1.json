@@ -1,12 +1,12 @@
 {
 	"inventory": {
 		"0": {
-			"amount": 6,
-			"id": "2"
+			"amount": 47,
+			"id": "1"
 		},
 		"1": {
-			"amount": 0,
-			"id": "0"
+			"amount": 3,
+			"id": "2"
 		},
 		"10": {
 			"amount": 0,

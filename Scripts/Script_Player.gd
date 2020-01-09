@@ -1,6 +1,6 @@
-extends KinematicBody2D
+extends Area2D
 
-const MAX_MOVE_SPEED = 10.0
+const MAX_MOVE_SPEED = 100
 const MAX_HP = 100
 
 const MAX_WATER_COUNT = 10
@@ -10,21 +10,28 @@ const MAX_AMMO_COUNT = 10
 enum MoveDirection { UP, DOWN, LEFT, RIGHT, NONE }
 
 puppet var slave_position = Vector2()
-puppet var slave_movement = MoveDirection.NONE
+puppet var slave_movement = Vector2(0.0, 0.0)
+
+puppet var direction = Vector2(0.0, 0.0)
 
 puppet var waterCount = MAX_WATER_COUNT
-puppet var foodCount = 10
+puppet var foodCount = 0
 puppet var ammoCount = MAX_AMMO_COUNT
 
+puppet var inventory_food_count = 10
+
 puppet var move_speed = MAX_MOVE_SPEED
-puppet var health_points = MAX_HP
+puppet var health_points = 10 setget set_health_points, get_health_points
 
 puppet var is_moving_double_slow = false
 
 master var bags = Array()
 master var timers = Array()
 
-puppet var is_chat_focused:bool = false
+puppet var is_other_window_focused:bool = false setget set_is_other_window_focused, get_is_other_window_focused
+
+onready var player = $Sprite
+
 
 func _ready():
 	
@@ -43,81 +50,94 @@ func _ready():
 		$ChatRoom.visible = false
 
 
-func _physics_process(delta):
-
-	if(!is_chat_focused):
-		var direction = MoveDirection.NONE
+func _input(event):
+	if(is_other_window_focused):
+		direction = Vector2(0.0, 0.0)
+	else:
 		if is_network_master():
 			if Input.is_action_pressed('die'):
 				_die()
 			
-			if Input.is_action_pressed('left'):
-				direction = MoveDirection.LEFT
-			elif Input.is_action_pressed('right'):
-				direction = MoveDirection.RIGHT
-			elif Input.is_action_pressed('up'):
-				direction = MoveDirection.UP
-			elif Input.is_action_pressed('down'):
-				direction = MoveDirection.DOWN
+			if event is InputEventScreenTouch:
+				if event.is_pressed():
+					direction = player.get_local_mouse_position().normalized()
+				else:
+					direction = Vector2(0.0, 0.0)
+			elif event is InputEventScreenDrag:
+#				direction = player.to_local(event.position).normalized()
+				direction = player.get_local_mouse_position().normalized()
+			elif event is InputEventKey:
+				if (Input.is_action_pressed('ui_left') && Input.is_action_pressed('ui_up')):
+					direction = Vector2(-0.5, -0.5)
+				elif (Input.is_action_pressed('ui_up') && Input.is_action_pressed('ui_right')):
+					direction = Vector2(0.5, -0.5)
+				elif (Input.is_action_pressed('ui_right') && Input.is_action_pressed('ui_down')):
+					direction = Vector2(0.5, 0.5)
+				elif (Input.is_action_pressed('ui_down') && Input.is_action_pressed('ui_left')):
+					direction = Vector2(-0.5, 0.5)
+				elif Input.is_action_pressed('ui_left'):
+					direction = Vector2(-1.0, 0.0)
+				elif Input.is_action_pressed('ui_right'):
+					direction = Vector2(1.0, 0.0)
+				elif Input.is_action_pressed('ui_up'):
+					direction = Vector2(0.0, -1.0)
+				elif Input.is_action_pressed('ui_down'):
+					direction = Vector2(0.0, 1.0)
+				else:
+					direction = Vector2(0.0, 0.0)
 			
 			$StatsLabel/FPSCountLabel.text = var2str(int(Engine.get_frames_per_second()))
-			$StatsLabel/PlayersCountLabel.text = var2str(int(Network.players.size()))
+			$StatsLabel/PlayersCountLabel.text = var2str(int(Global_Network.players.size()))
 			
 			rset_unreliable('slave_position', position)
 			rset('slave_movement', direction)
-			_move(direction)
+#			_move(direction)
 		else:
-			_move(slave_movement)
+#			_move(slave_movement)
 			position = slave_position
 		
 		if get_tree().is_network_server():
-			Network.update_position(int(name), position)
+			Global_Network.update_position(int(name), position)
+
+
+func _physics_process(delta):
 	
-		if(waterCount >= 1):
-			waterCount -= delta
-			regen(delta)
-			_update_item_labels()
-		else:
-			damage(delta)
-			_update_item_labels()
-			_no_water_left()
+	if(direction):
+		position = position + direction * move_speed * delta
 	
-		if(foodCount >= 1):
-			if(is_moving_double_slow):
-				is_moving_double_slow = false
-				move_speed = MAX_MOVE_SPEED
-			_update_item_labels()
-		else:
-			if(!is_moving_double_slow):
-				is_moving_double_slow = true
-				move_speed = move_speed / 2
-			_no_food_left()
+	if(waterCount >= 1):
+		waterCount -= delta
+		regen(delta)
+		_update_item_labels()
+	else:
+		damage(delta)
+		_update_item_labels()
+		_no_water_left()
+	
+	if(foodCount >= 1):
+		foodCount -= delta
+		var inventory_item = $ListMenu/Control.inventory_get_item_by_id_player(1)
+		if(!inventory_item.empty()):
+			inventory_food_count = inventory_item.amount
+		$ListMenu/Control.inventory_update_item_player(int($ListMenu/Control.inventory_get_slot_by_item_id_player(1)), int(inventory_item.id), int(foodCount))
+		$ListMenu/Control._update_slots_player()
+		if(is_moving_double_slow):
+			is_moving_double_slow = false
+			move_speed = MAX_MOVE_SPEED
+		_update_item_labels()
+	else:
+		if(!is_moving_double_slow):
+			is_moving_double_slow = true
+			move_speed = move_speed / 2
+		_no_food_left()
 	update_player_money()
 
-
-func _move(direction):
-	match direction:
-		MoveDirection.NONE:
-			return
-		MoveDirection.UP:
-			move_and_collide(Vector2(0, -move_speed))
-			$Sprite.rotation_degrees = 0
-		MoveDirection.DOWN:
-			move_and_collide(Vector2(0, move_speed))
-			$Sprite.rotation_degrees = 180
-		MoveDirection.LEFT:
-			move_and_collide(Vector2(-move_speed, 0))
-			$Sprite.rotation_degrees = 270
-		MoveDirection.RIGHT:
-			move_and_collide(Vector2(move_speed, 0))
-			$Sprite.rotation_degrees = 90
 
 func _update_health_bar():
 	$GUI/HealthBar.value = health_points
 
+
 func _update_item_labels():
-	if($ListMenu/Control.inventory_get_item_by_id_player(1)):
-		foodCount = $ListMenu/Control.inventory_get_item_by_id_player(1).amount
 	
 	$StatsLabel/HealthCountLabel.text = var2str(int(health_points)) + "/" + var2str(int(MAX_HP))
 	$StatsLabel/WaterCountLabel.text = var2str(int(waterCount)) + "/" + var2str(int(MAX_WATER_COUNT))
@@ -132,6 +152,7 @@ func _update_item_labels():
 
 	$StatsLabel/SpeedCountLabel.text = var2str(int(move_speed)) + "/" + var2str(int(MAX_MOVE_SPEED))
 
+
 func damage(value):
 	health_points -= value
 	if health_points <= 0:
@@ -139,10 +160,12 @@ func damage(value):
 		rpc('_die')
 	_update_health_bar()
 
+
 func regen(value):
 	if(health_points <= MAX_HP):
 		health_points += value
 	_update_health_bar()
+
 
 sync func _die():
 	$RespawnTimer.start()
@@ -152,10 +175,13 @@ sync func _die():
 			child.hide()
 	$CollisionShape2D.disabled = true
 	rpc("_spawn_bag")
-	
+
+
 sync func _spawn_bag():
 	var bagSprite = Sprite.new()
+
 	bagSprite.texture = load("res://Assets/Images/bag.png")
+	bagSprite.set_centered(true)
 	bagSprite.set_global_position($GUI/HealthBar.get_global_position())
 	
 	bags.append(bagSprite)
@@ -167,33 +193,42 @@ sync func _spawn_bag():
 	add_child(timer)
 	timer.start()
 
+
 # need fix to delete only one bag not all 2019-12-23
 func _on_bag_timer_timeout():
 #	for bag in bags:
 #		bag.queue_free() it crashes whole game after some time
 	pass
 
+
 func _on_RespawnTimer_timeout():
 	set_physics_process(true)
 	for child in get_children():
-		if child.has_method('show'):
+		if child.has_method('show') && is_network_master():
 			child.show()
+	$Sprite.show() # show player skin for other players
+	
+	$GUI.show() # show player health and nickname for other players
 	$CollisionShape2D.disabled = false
 	health_points = MAX_HP
 	_update_health_bar()
-	
+
+
 func _no_water_left():
 	$StatsLabel/WaterLabel.set("custom_colors/font_color", Color(1,0,0))
+
 
 func _no_food_left():
 	$StatsLabel/FoodLabel.set("custom_colors/font_color", Color(1,0,0))
 
+
 func _no_ammo_left():
 	$StatsLabel/AmmoLabel.set("custom_colors/font_color", Color(1,0,0))
 
+
 func init(nickname, start_position, is_slave):
 	$GUI/Nickname.text = nickname
-	global_position = start_position
+#	global_position = start_position
 	
 	$ListMenu/Control.load_data_player(nickname)
 	$ListMenu/Control.load_data_shop("Alkubra")
@@ -203,6 +238,7 @@ func init(nickname, start_position, is_slave):
 	if is_network_master():
 		$Camera2D.current = 1
 		$ChatRoom.host_room()
+
 
 func town_entered():
 	$ListIcon.modulate = Color(1,1,0,0.5)
@@ -215,6 +251,7 @@ func town_exited():
 	
 	$ListMenu/Control._hide_shop()
 
+
 func update_player_money():
 	var money_count
 	if($ListMenu/Control.inventory_get_item_by_id_player(1)):
@@ -222,3 +259,25 @@ func update_player_money():
 	else:
 		money_count = 0
 	$StatsLabel/MoneyCountLabel.set_text(var2str(int(money_count)))
+
+
+func _on_Player_area_entered(area):
+	if area.has_method("get_health_points"):
+		if(health_points <= area.get_health_points()):
+			_die()
+
+
+func set_health_points(hp:int)->void:
+	health_points = hp
+
+
+func get_health_points():
+	return health_points
+
+
+func set_is_other_window_focused(is_focused):
+	is_other_window_focused = is_focused
+
+
+func get_is_other_window_focused():
+	return is_other_window_focused

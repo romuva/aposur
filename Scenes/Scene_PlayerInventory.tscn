@@ -1,7 +1,6 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scripts/Script_PlayerInventory.gd" type="Script" id=1]
-[ext_resource path="res://Assets/Images/icon.png" type="Texture" id=2]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
@@ -78,13 +77,14 @@ margin_right = 100.017
 margin_bottom = 490.0
 text = "Save"
 
-[node name="Button_SellBuy" type="Button" parent="Panel"]
+[node name="Button_SellBuyDrop" type="Button" parent="Panel"]
 visible = false
 margin_left = 410.684
 margin_top = 440.0
 margin_right = 500.684
 margin_bottom = 490.0
 shortcut_in_tooltip = false
+text = "Drop"
 
 [node name="Button_AddItem" type="Button" parent="Panel"]
 modulate = Color( 1, 1, 1, 0.882353 )
@@ -134,82 +134,6 @@ margin_right = 300.0
 margin_bottom = 120.0
 text = "Close"
 
-[node name="WindowDialog_SplitItemWindow" type="WindowDialog" parent="Panel"]
-editor/display_folded = true
-margin_left = 240.0
-margin_top = 160.0
-margin_right = 610.0
-margin_bottom = 300.0
-window_title = "Split Item"
-
-[node name="SplitItemWindow_Button_Split" type="Button" parent="Panel/WindowDialog_SplitItemWindow"]
-margin_left = 80.0
-margin_top = 90.0
-margin_right = 180.0
-margin_bottom = 120.0
-text = "Split"
-
-[node name="SplitItemWindow_Button_Cancel" type="Button" parent="Panel/WindowDialog_SplitItemWindow"]
-margin_left = 200.0
-margin_top = 90.0
-margin_right = 300.0
-margin_bottom = 120.0
-text = "Cancel"
-
-[node name="SplitItemWindow_HSlider_Amount" type="HSlider" parent="Panel/WindowDialog_SplitItemWindow"]
-margin_left = 80.0
-margin_top = 30.0
-margin_right = 300.0
-margin_bottom = 46.0
-min_value = 1.0
-value = 1.0
-tick_count = 1
-ticks_on_borders = true
-
-[node name="SplitItemWindow_Label_Amount" type="Label" parent="Panel/WindowDialog_SplitItemWindow"]
-margin_left = 80.0
-margin_top = 60.0
-margin_right = 300.0
-margin_bottom = 74.0
-text = "1"
-align = 1
-
-[node name="WindowDialog_ItemMenu" type="WindowDialog" parent="Panel"]
-margin_left = 300.0
-margin_top = 130.0
-margin_right = 590.0
-margin_bottom = 370.0
-
-[node name="ItemMenu_TextureFrame_Icon" type="TextureRect" parent="Panel/WindowDialog_ItemMenu"]
-margin_left = 120.0
-margin_top = 10.0
-margin_right = 168.0
-margin_bottom = 58.0
-texture = ExtResource( 2 )
-expand = true
-stretch_mode = 6
-
-[node name="ItemMenu_RichTextLabel_ItemInfo" type="RichTextLabel" parent="Panel/WindowDialog_ItemMenu"]
-margin_left = 10.0
-margin_top = 70.0
-margin_right = 280.0
-margin_bottom = 170.0
-bbcode_enabled = true
-
-[node name="ItemMenu_Button_DropItem" type="Button" parent="Panel/WindowDialog_ItemMenu"]
-margin_left = 31.8307
-margin_top = 190.0
-margin_right = 131.831
-margin_bottom = 220.0
-text = "Drop"
-
-[node name="ItemMenu_Button_DropAllItem" type="Button" parent="Panel/WindowDialog_ItemMenu"]
-margin_left = 168.05
-margin_top = 190.735
-margin_right = 268.05
-margin_bottom = 220.735
-text = "Drop All"
-
 [node name="Label" type="Label" parent="Panel"]
 margin_left = 120.2
 margin_top = 14.0
@@ -231,39 +155,39 @@ position = Vector2( 449.749, 125 )
 
 [node name="SelectedItemNameLabel" type="Label" parent="Panel"]
 margin_left = 430.718
-margin_top = 83.0
+margin_top = 60.0
 margin_right = 470.718
-margin_bottom = 97.0
+margin_bottom = 74.0
 grow_horizontal = 2
 align = 1
 
 [node name="CountLabel" type="Label" parent="Panel"]
 margin_left = 400.668
-margin_top = 153.0
+margin_top = 180.0
 margin_right = 500.668
-margin_bottom = 167.0
+margin_bottom = 194.0
 grow_vertical = 2
 align = 1
 
 [node name="PriceLabel" type="Label" parent="Panel"]
 margin_left = 380.634
-margin_top = 193.0
+margin_top = 220.0
 margin_right = 520.634
-margin_bottom = 207.0
+margin_bottom = 234.0
 grow_horizontal = 2
 
 [node name="WeightLabel" type="Label" parent="Panel"]
 margin_left = 380.634
-margin_top = 212.0
+margin_top = 239.0
 margin_right = 521.634
-margin_bottom = 226.0
+margin_bottom = 253.0
 grow_horizontal = 2
 
 [node name="DescriptionLabel" type="Label" parent="Panel"]
 margin_left = 381.0
-margin_top = 270.0
+margin_top = 297.0
 margin_right = 522.0
-margin_bottom = 325.0
+margin_bottom = 352.0
 grow_horizontal = 2
 
 [node name="HSlider" type="HSlider" parent="Panel"]
@@ -282,19 +206,14 @@ margin_top = 340.0
 margin_right = 478.701
 margin_bottom = 364.0
 align = 1
-[connection signal="item_rmb_selected" from="Panel/ItemList" to="." method="_on_ItemList_item_rmb_selected"]
+[connection signal="visibility_changed" from="." to="." method="_on_Control_visibility_changed"]
 [connection signal="item_selected" from="Panel/ItemList" to="." method="_on_ItemList_item_selected"]
 [connection signal="mouse_entered" from="Panel/ItemList" to="." method="_on_ItemList_mouse_entered"]
 [connection signal="mouse_exited" from="Panel/ItemList" to="." method="_on_ItemList_mouse_exited"]
 [connection signal="item_selected" from="Panel/ItemList2" to="." method="_on_ItemList2_item_selected"]
 [connection signal="pressed" from="Panel/Button_Save" to="." method="_on_Button_Save_pressed"]
-[connection signal="pressed" from="Panel/Button_SellBuy" to="." method="_on_Button_SellBuy_pressed"]
+[connection signal="pressed" from="Panel/Button_SellBuyDrop" to="." method="_on_Button_SellBuyDrop_pressed"]
 [connection signal="pressed" from="Panel/Button_AddItem" to="." method="_on_Button_AddItem_pressed"]
 [connection signal="pressed" from="Panel/WindowDialog_AddItemWindow/AddItemWindow_Button_AddItem" to="." method="_on_AddItemWindow_Button_AddItem_pressed"]
 [connection signal="pressed" from="Panel/WindowDialog_AddItemWindow/AddItemWindow_Button_Close" to="." method="_on_AddItemWindow_Button_Close_pressed"]
-[connection signal="pressed" from="Panel/WindowDialog_SplitItemWindow/SplitItemWindow_Button_Split" to="." method="_on_SplitItemWindow_Button_Split_pressed"]
-[connection signal="pressed" from="Panel/WindowDialog_SplitItemWindow/SplitItemWindow_Button_Cancel" to="." method="_on_SplitItemWindow_Button_Cancel_pressed"]
-[connection signal="value_changed" from="Panel/WindowDialog_SplitItemWindow/SplitItemWindow_HSlider_Amount" to="." method="_on_SplitItemWindow_HSlider_Amount_value_changed"]
-[connection signal="pressed" from="Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropItem" to="." method="_on_ItemMenu_Button_DropItem_pressed"]
-[connection signal="pressed" from="Panel/WindowDialog_ItemMenu/ItemMenu_Button_DropAllItem" to="." method="_on_ItemMenu_Button_DropAllItem_pressed"]
 [connection signal="value_changed" from="Panel/HSlider" to="." method="_on_HSlider_value_changed"]

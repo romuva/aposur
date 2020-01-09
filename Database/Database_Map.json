@@ -10,12 +10,12 @@
 	},
 	
 	"1": {
-		"name": "Bag",
-		"icon": "res://Assets/Images/bag.png",
-		"type": "item",
-		"x": 0,
+		"name": "Quebec",
+		"icon": "res://Assets/Images/town_skin.png",
+		"type": "town",
+		"x": 300,
 		"y": 0,
-		"description": "Something in a bag.",
+		"description": "Military base-town. Here you can find best guns and ammo!",
 		"is_pickable": true
 	},
 }

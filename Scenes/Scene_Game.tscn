@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Scripts/Script_Game.gd" type="Script" id=1]
-[ext_resource path="res://Scripts/Script_Area2DTown.gd" type="Script" id=2]
+[ext_resource path="res://Scripts/Script_Town.gd" type="Script" id=2]
 [ext_resource path="res://Assets/Images/town_skin.png" type="Texture" id=3]
 
 [sub_resource type="CircleShape2D" id=1]
@@ -11,14 +11,17 @@ radius = 53.0951
 script = ExtResource( 1 )
 
 [node name="Area2DTown" type="Area2D" parent="."]
+position = Vector2( 300, 300 )
 script = ExtResource( 2 )
 
 [node name="Town" type="Sprite" parent="Area2DTown"]
 position = Vector2( 500, 100 )
+scale = Vector2( 1.5, 1.5 )
 texture = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DTown"]
 position = Vector2( 500, 100 )
+scale = Vector2( 1.5, 1.5 )
 shape = SubResource( 1 )
 
 [node name="Label" type="Label" parent="Area2DTown"]
@@ -78,5 +81,5 @@ margin_right = 529.474
 margin_bottom = 147.68
 rect_pivot_offset = Vector2( 24, 7 )
 text = "0"
-[connection signal="body_entered" from="Area2DTown" to="Area2DTown" method="_on_Area2D_body_entered"]
-[connection signal="body_exited" from="Area2DTown" to="Area2DTown" method="_on_Area2DTown_body_exited"]
+[connection signal="area_entered" from="Area2DTown" to="Area2DTown" method="_on_Area2DTown_area_entered"]
+[connection signal="area_exited" from="Area2DTown" to="Area2DTown" method="_on_Area2DTown_area_exited"]

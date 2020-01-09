@@ -8,6 +8,7 @@ export_presets.cfg
 .mono/
 
 *.exe
+*.x86_64
 *.apk
 *.pck
 *.7z

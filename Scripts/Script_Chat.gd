@@ -11,6 +11,8 @@ var nick
 
 func _ready():
 	chat_display = $RoomUI/ChatDisplay
+	chat_display.set_scroll_follow(true)
+	
 	chat_input = $RoomUI/ChatInput
 	
 	get_tree().connect("connected_to_server", self, "enter_room")
@@ -67,12 +69,16 @@ sync func receive_message(id, player_name, msg):
 
 
 func _on_ChatInput_focus_entered():
-	get_parent().is_chat_focused = true
+	get_parent().set_is_other_window_focused(true)
 
 
 func _on_ChatInput_focus_exited():
-	get_parent().is_chat_focused = false
+	get_parent().set_is_other_window_focused(false)
 
 
 func _on_ChatInput_text_entered(new_text):
 	$RoomUI/ChatInput.release_focus()
+
+
+func _on_Button_pressed():
+	send_message()

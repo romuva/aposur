@@ -11,27 +11,36 @@ script = ExtResource( 1 )
 
 [node name="RoomUI" type="Panel" parent="."]
 modulate = Color( 1, 1, 1, 0.882353 )
-margin_left = -492.637
+margin_left = -491.0
 margin_top = 50.0
-margin_right = -192.637
+margin_right = -190.0
 margin_bottom = 250.0
 
-[node name="ChatDisplay" type="TextEdit" parent="RoomUI"]
-margin_left = 9.99997
-margin_top = 9.53784
-margin_right = 290.0
-margin_bottom = 159.538
-focus_mode = 0
-readonly = true
-
 [node name="ChatInput" type="LineEdit" parent="RoomUI"]
-margin_left = 9.99997
-margin_top = 169.538
-margin_right = 290.0
-margin_bottom = 193.538
+margin_left = 10.0
+margin_top = 160.0
+margin_right = 231.0
+margin_bottom = 190.0
 focus_mode = 1
 focus_mode = 1
 placeholder_text = "Your message here..."
+
+[node name="ChatDisplay" type="RichTextLabel" parent="RoomUI"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 290.0
+margin_bottom = 160.0
+meta_underlined = false
+scroll_following = true
+
+[node name="Button" type="Button" parent="RoomUI"]
+margin_left = 240.967
+margin_top = 160.226
+margin_right = 289.967
+margin_bottom = 190.226
+button_mask = 7
+text = "Send"
 [connection signal="focus_entered" from="RoomUI/ChatInput" to="." method="_on_ChatInput_focus_entered"]
 [connection signal="focus_exited" from="RoomUI/ChatInput" to="." method="_on_ChatInput_focus_exited"]
 [connection signal="text_entered" from="RoomUI/ChatInput" to="." method="_on_ChatInput_text_entered"]
+[connection signal="pressed" from="RoomUI/Button" to="." method="_on_Button_pressed"]
