@@ -1,6 +1,4 @@
-# aposur
-Apocalypse Survivor
-
+# Apocalypse Survivor
 Post-apocalypse survival 2D MMORPG. Less resource consuming means more players in server! 
 
 
