@@ -13,6 +13,7 @@ Compiling:
 3. Export to your favorite platform.
 
 
-SOCIAL CHANNELS
+# Social channels
+This project is open-source. Have an idea? Then help us to make this game even better!
 
 Discord: https://discord.gg/8YPGdSG
