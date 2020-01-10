@@ -24,6 +24,8 @@ var is_shop_selected = false
 
 var is_inside_shop = false
 
+var first_time_food_update = false
+
 func _ready() -> void:
 
 	set_process(false)
@@ -221,7 +223,6 @@ func inventory_remove_item_shop(slot, is_all = false, count:int = 1) -> int:
 
 
 func inventory_update_item_player(slot:int, new_id:int, new_amount:int) -> void:
-	print(var2str(slot)+var2str(new_id)+var2str(new_amount))
 	if (slot < 0):
 		return
 	if (new_amount < 0):
@@ -338,6 +339,10 @@ func update_slot_player(slot:int) -> void:
 	var item_meta_data = Global_ItemDatabase.get_item(str(inventory_item["id"])).duplicate()
 	var icon = ResourceLoader.load(item_meta_data["icon"])
 	var amount = int(inventory_item["amount"])
+	
+	if(int(inventory_item["id"]) == 1 && !first_time_food_update):
+		get_parent().get_parent().set_food_count(inventory_item["amount"])
+		first_time_food_update = true
 
 	item_meta_data["amount"] = amount
 	if (!item_meta_data["stackable"]):

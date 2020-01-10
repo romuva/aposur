@@ -1,4 +1,6 @@
 # Apocalypse Survivor
+www.aposur.com
+
 Post-apocalypse survival 2D MMORPG. Less resource consuming means more players in server! 
 
 
@@ -17,3 +19,5 @@ Compiling:
 This project is open-source. Have an idea? Then help us to make this game even better!
 
 Discord: https://discord.gg/8YPGdSG
+E-mail: info@aposur.com
+Website: www.aposur.com

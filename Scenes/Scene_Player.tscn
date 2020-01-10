@@ -186,12 +186,13 @@ rect_pivot_offset = Vector2( 130, 33.7847 )
 text = "Load:"
 
 [node name="LoadCountLabel" type="Label" parent="StatsLabel"]
-margin_left = 31.0222
+margin_left = 97.0909
 margin_top = 180.0
-margin_right = 71.0222
+margin_right = 137.091
 margin_bottom = 194.0
 rect_pivot_offset = Vector2( 40, 33.7847 )
 text = "0/0kg"
+align = 2
 
 [node name="MoneyLabel" type="Label" parent="StatsLabel"]
 margin_left = -5.72168
@@ -202,12 +203,13 @@ rect_pivot_offset = Vector2( 130, 33.7847 )
 text = "Money:"
 
 [node name="MoneyCountLabel" type="Label" parent="StatsLabel"]
-margin_left = 43.9193
+margin_left = 98.1716
 margin_top = 194.0
-margin_right = 83.9193
+margin_right = 138.172
 margin_bottom = 208.0
 rect_pivot_offset = Vector2( 40, 33.7847 )
 text = "0"
+align = 2
 
 [node name="ChatRoom" parent="." groups=[
 "Group_ChatRoom",

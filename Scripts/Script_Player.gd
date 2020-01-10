@@ -15,10 +15,10 @@ puppet var slave_movement = Vector2(0.0, 0.0)
 puppet var direction = Vector2(0.0, 0.0)
 
 puppet var waterCount = MAX_WATER_COUNT
-puppet var foodCount = 0
+puppet var foodCount = 0 setget set_food_count, get_food_count
 puppet var ammoCount = MAX_AMMO_COUNT
 
-puppet var inventory_food_count = 10
+puppet var inventory_food_count = 0
 
 puppet var move_speed = MAX_MOVE_SPEED
 puppet var health_points = 10 setget set_health_points, get_health_points
@@ -115,9 +115,9 @@ func _physics_process(delta):
 		_no_water_left()
 	
 	if(foodCount >= 1):
-		foodCount -= delta
+		foodCount -= delta * 0.1
 		var inventory_item = $ListMenu/Control.inventory_get_item_by_id_player(1)
-		if(!inventory_item.empty()):
+		if(!inventory_item):
 			inventory_food_count = inventory_item.amount
 		$ListMenu/Control.inventory_update_item_player(int($ListMenu/Control.inventory_get_slot_by_item_id_player(1)), int(inventory_item.id), int(foodCount))
 		$ListMenu/Control._update_slots_player()
@@ -232,7 +232,7 @@ func init(nickname, start_position, is_slave):
 	
 	$ListMenu/Control.load_data_player(nickname)
 	$ListMenu/Control.load_data_shop("Alkubra")
-
+		
 #	if is_slave:
 #		$Sprite.texture = load('res://player/character-alt.png')
 	if is_network_master():
@@ -281,3 +281,10 @@ func set_is_other_window_focused(is_focused):
 
 func get_is_other_window_focused():
 	return is_other_window_focused
+
+
+func set_food_count(count):
+	foodCount = count
+
+func get_food_count():
+	return foodCount
