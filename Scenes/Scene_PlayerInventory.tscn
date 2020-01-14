@@ -207,9 +207,11 @@ margin_right = 478.701
 margin_bottom = 364.0
 align = 1
 [connection signal="visibility_changed" from="." to="." method="_on_Control_visibility_changed"]
+[connection signal="item_activated" from="Panel/ItemList" to="." method="_on_ItemList_item_activated"]
 [connection signal="item_selected" from="Panel/ItemList" to="." method="_on_ItemList_item_selected"]
 [connection signal="mouse_entered" from="Panel/ItemList" to="." method="_on_ItemList_mouse_entered"]
 [connection signal="mouse_exited" from="Panel/ItemList" to="." method="_on_ItemList_mouse_exited"]
+[connection signal="visibility_changed" from="Panel/ItemList" to="." method="_on_ItemList_visibility_changed"]
 [connection signal="item_selected" from="Panel/ItemList2" to="." method="_on_ItemList2_item_selected"]
 [connection signal="pressed" from="Panel/Button_Save" to="." method="_on_Button_Save_pressed"]
 [connection signal="pressed" from="Panel/Button_SellBuyDrop" to="." method="_on_Button_SellBuyDrop_pressed"]

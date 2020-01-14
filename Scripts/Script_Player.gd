@@ -15,10 +15,12 @@ puppet var slave_movement = Vector2(0.0, 0.0)
 puppet var direction = Vector2(0.0, 0.0)
 
 puppet var waterCount = MAX_WATER_COUNT
-puppet var foodCount = 0 setget set_food_count, get_food_count
+puppet var food_count = 0 setget set_food_count, get_food_count
 puppet var ammoCount = MAX_AMMO_COUNT
 
-puppet var inventory_food_count = 0
+puppet var money_count = 0
+
+puppet var inventory_minus_food_count = 0
 
 puppet var move_speed = MAX_MOVE_SPEED
 puppet var health_points = 10 setget set_health_points, get_health_points
@@ -31,7 +33,6 @@ master var timers = Array()
 puppet var is_other_window_focused:bool = false setget set_is_other_window_focused, get_is_other_window_focused
 
 onready var player = $Sprite
-
 
 func _ready():
 	
@@ -114,24 +115,32 @@ func _physics_process(delta):
 		_update_item_labels()
 		_no_water_left()
 	
-	if(foodCount >= 1):
-		foodCount -= delta * 0.1
+	if(food_count >= 1):
+		food_count -= delta * 0.1
 		var inventory_item = $ListMenu/Control.inventory_get_item_by_id_player(1)
 		if(!inventory_item):
-			inventory_food_count = inventory_item.amount
-		$ListMenu/Control.inventory_update_item_player(int($ListMenu/Control.inventory_get_slot_by_item_id_player(1)), int(inventory_item.id), int(foodCount))
-		$ListMenu/Control._update_slots_player()
-		if(is_moving_double_slow):
-			is_moving_double_slow = false
-			move_speed = MAX_MOVE_SPEED
-		_update_item_labels()
+			food_count = 0
+			money_count = 0
+			if($ListMenu/Control.inventory_get_slot_by_item_id_player(1)):
+				$ListMenu/Control.inventory_remove_item_player(int($ListMenu/Control.inventory_get_slot_by_item_id_player(1)), true)
+		else:
+			inventory_minus_food_count += delta * 0.1
+			if(!is_other_window_focused && inventory_minus_food_count < food_count):
+				$ListMenu/Control.inventory_remove_item_player(int($ListMenu/Control.inventory_get_slot_by_item_id_player(1)), false, int(inventory_minus_food_count))
+			inventory_minus_food_count = inventory_minus_food_count - int(inventory_minus_food_count)
+			$ListMenu/Control._update_slots_player()
+			if(is_moving_double_slow):
+				is_moving_double_slow = false
+				move_speed = MAX_MOVE_SPEED
 	else:
 		if(!is_moving_double_slow):
 			is_moving_double_slow = true
 			move_speed = move_speed / 2
-		_no_food_left()
+#		_no_food_left()
+	money_count = food_count
+	_update_item_labels()
+	update_player_food()
 	update_player_money()
-
 
 func _update_health_bar():
 	$GUI/HealthBar.value = health_points
@@ -141,12 +150,9 @@ func _update_item_labels():
 	
 	$StatsLabel/HealthCountLabel.text = var2str(int(health_points)) + "/" + var2str(int(MAX_HP))
 	$StatsLabel/WaterCountLabel.text = var2str(int(waterCount)) + "/" + var2str(int(MAX_WATER_COUNT))
-	$StatsLabel/FoodCountLabel.text = var2str(int(foodCount))
 	$StatsLabel/AmmoCountLabel.text = var2str(int(ammoCount)) + "/" + var2str(int(MAX_AMMO_COUNT))
 	if(waterCount >= 1):
 		$StatsLabel/WaterLabel.set("custom_colors/font_color", Color(1,1,1))
-	if(foodCount >= 1):
-		$StatsLabel/FoodLabel.set("custom_colors/font_color", Color(1,1,1))
 	if(ammoCount >= 1):
 		$StatsLabel/AmmoLabel.set("custom_colors/font_color", Color(1,1,1))
 
@@ -218,8 +224,8 @@ func _no_water_left():
 	$StatsLabel/WaterLabel.set("custom_colors/font_color", Color(1,0,0))
 
 
-func _no_food_left():
-	$StatsLabel/FoodLabel.set("custom_colors/font_color", Color(1,0,0))
+#func _no_food_left():
+#	$StatsLabel/FoodLabel.set("custom_colors/font_color", Color(1,0,0))
 
 
 func _no_ammo_left():
@@ -231,7 +237,6 @@ func init(nickname, start_position, is_slave):
 #	global_position = start_position
 	
 	$ListMenu/Control.load_data_player(nickname)
-	$ListMenu/Control.load_data_shop("Alkubra")
 		
 #	if is_slave:
 #		$Sprite.texture = load('res://player/character-alt.png')
@@ -253,7 +258,6 @@ func town_exited():
 
 
 func update_player_money():
-	var money_count
 	if($ListMenu/Control.inventory_get_item_by_id_player(1)):
 		money_count = $ListMenu/Control.inventory_get_item_by_id_player(1).amount
 	else:
@@ -261,10 +265,22 @@ func update_player_money():
 	$StatsLabel/MoneyCountLabel.set_text(var2str(int(money_count)))
 
 
+func update_player_food():
+	if($ListMenu/Control.inventory_get_item_by_id_player(1)):
+		food_count = $ListMenu/Control.inventory_get_item_by_id_player(1).amount
+		$StatsLabel/FoodLabel.set("custom_colors/font_color", Color(1,1,1))
+	else:
+		food_count = 0
+		$StatsLabel/FoodLabel.set("custom_colors/font_color", Color(1,0,0))
+	$StatsLabel/FoodCountLabel.set_text(var2str(int(food_count)))
+
+
 func _on_Player_area_entered(area):
-	if area.has_method("get_health_points"):
+	if area.has_method("get_health_points"): # it is player
 		if(health_points <= area.get_health_points()):
 			_die()
+	elif(area.has_method("_update_town_labels")): # it is town
+		$ListMenu/Control.load_data_shop(area.get_node("Label").text)
 
 
 func set_health_points(hp:int)->void:
@@ -284,7 +300,7 @@ func get_is_other_window_focused():
 
 
 func set_food_count(count):
-	foodCount = count
+	food_count = count
 
 func get_food_count():
-	return foodCount
+	return food_count

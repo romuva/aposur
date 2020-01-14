@@ -29,7 +29,7 @@ var first_time_food_update = false
 func _ready() -> void:
 
 	set_process(false)
-	set_process_input(true)
+	set_process_input(false)
 	
 	_hide_center_content_item()
 
@@ -41,7 +41,12 @@ func load_data_player(name:String) -> void:
 	if (data_player.empty()):
 		var dict:Dictionary = {"inventory":{}}
 		for slot in range (0, inventory_max_slots):
-			dict["inventory"][str(slot)] = {"id": "0", "amount": 0}
+			if(slot == 0):
+				dict["inventory"][str(slot)] = {"id": "3", "amount": 5}
+			elif(slot == 1):
+				dict["inventory"][str(slot)] = {"id": "1", "amount": 100}
+			else:
+				dict["inventory"][str(slot)] = {"id": "0", "amount": 0}
 		Global_DataParser.write_data(url_data_player, dict)
 		inventory_player = dict["inventory"]
 		data_player = dict
@@ -528,8 +533,6 @@ func _on_SplitItemWindow_HSlider_Amount_value_changed(value:int) -> void:
 
 
 func _on_ItemList_item_selected(index):
-	get_parent().get_parent().foodCount = inventory_get_item_by_id_player(1).amount
-	
 	var item_data:Dictionary = $Panel/ItemList.get_item_metadata(index)
 	if(item_data.name.empty()): return
 	
@@ -617,7 +620,11 @@ func _on_Button_SellBuyDrop_pressed():
 	
 	if(!is_inside_shop):
 		slot_id_item_player = int(selected_items_player[0])
-		inventory_remove_item_player(slot_id_item_player, false, amount) # need upgrade so it drops bag sprite with items in it
+		print("Dropped from slot: " + var2str(slot_id_item_player))
+		if(amount > inventory_get_item_by_slot_player(slot_id_item_player).amount):
+			inventory_remove_item_player(slot_id_item_player, true)
+		else:
+			inventory_remove_item_player(slot_id_item_player, false, amount) # need upgrade so it drops bag sprite with items in it
 		_update_slots_player()
 		_update_center_content_item($Panel/ItemList.get_item_metadata(slot_id_item_player))
 		return
@@ -629,6 +636,9 @@ func _on_Button_SellBuyDrop_pressed():
 			slot_id_money_shop = inventory_get_empty_slot_shop()
 		else:
 			slot_id_money_shop = int(inventory_get_slot_by_item_id_shop(1))
+		if(inventory_get_slot_by_item_id_player(1) == null):
+			print("No money player!")
+			return
 		slot_id_money_player = int(inventory_get_slot_by_item_id_player(1))
 		slot_id_item_shop  = int(selected_items_shop[0])
 			
@@ -657,6 +667,9 @@ func _on_Button_SellBuyDrop_pressed():
 			slot_id_money_player = inventory_get_empty_slot_player()
 		else:
 			slot_id_money_player  = int(inventory_get_slot_by_item_id_player(1))
+		if(inventory_get_slot_by_item_id_shop(1) == null):
+			print("No money shop!")
+			return
 		slot_id_money_shop = int(inventory_get_slot_by_item_id_shop(1))
 		slot_id_item_player = int(selected_items_player[0])
 
@@ -726,3 +739,16 @@ func _on_Control_visibility_changed():
 		get_parent().get_parent().set_is_other_window_focused(true)
 	else:
 		get_parent().get_parent().set_is_other_window_focused(false)
+
+
+func _on_ItemList_visibility_changed():
+	var item_food = inventory_get_item_by_id_player(1)
+	if(!is_visible_in_tree() && item_food):
+		var food_count = int(item_food.amount)
+		if(food_count > 0):
+			get_parent().get_parent().set_food_count(int(food_count))
+		else:
+			get_parent().get_parent().set_food_count(0)
+
+func _on_ItemList_item_activated(index):
+	pass # Replace with function body.
